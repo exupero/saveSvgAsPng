@@ -26,6 +26,14 @@
     }
   }
 
+  function moveChildren(src, dest) {
+    while (src.children.length > 0) {
+      var child = src.children[0];
+      dest.appendChild(child);
+    }
+    return dest;
+  }
+
   function inlineStyles(dom) {
     var sheets = document.styleSheets;
     for (var i = 0; i < sheets.length; i++) {
@@ -57,7 +65,9 @@
       clone.setAttribute("xmlns:xlink", "http://www.w3.org/1999/xlink");
       clone.setAttribute("width", width * scaleFactor);
       clone.setAttribute("height", height * scaleFactor);
-      clone.setAttribute("transform", "scale(" + scaleFactor + ")");
+      var scaling = document.createElement("g");
+      scaling.setAttribute("transform", "scale(" + scaleFactor + ")");
+      clone.appendChild(moveChildren(clone, scaling));
       outer.appendChild(clone);
 
       inlineStyles(outer);

@@ -34,7 +34,8 @@
     return dest;
   }
 
-  function inlineStyles(dom) {
+  function styles(dom) {
+    var used = "";
     var sheets = document.styleSheets;
     for (var i = 0; i < sheets.length; i++) {
       var rules = sheets[i].cssRules;
@@ -42,13 +43,20 @@
         var rule = rules[j];
         if (typeof(rule.style) != "undefined") {
           var elems = dom.querySelectorAll(rule.selectorText);
-          for (var k = 0; k < elems.length; k++) {
-            var elem = elems[k];
-            elem.style.cssText += rule.style.cssText;
+          if (elems.length > 0) {
+            used += rule.selectorText + " { " + rule.style.cssText + " }\n";
           }
         }
       }
     }
+
+    var s = document.createElement('style');
+    s.setAttribute('type', 'text/css');
+    s.innerHTML = "<![CDATA[\n" + used + "\n]]>";
+
+    var defs = document.createElement('defs');
+    defs.appendChild(s);
+    return defs;
   }
 
   window.saveSvgAsPng = function(el, name, scaleFactor) {
@@ -70,7 +78,7 @@
       clone.appendChild(moveChildren(clone, scaling));
       outer.appendChild(clone);
 
-      inlineStyles(outer);
+      clone.insertBefore(styles(clone), clone.firstChild);
 
       var svg = doctype + outer.innerHTML;
       var image = new Image();

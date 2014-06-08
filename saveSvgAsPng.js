@@ -1,4 +1,6 @@
 (function() {
+  var out$ = typeof exports != 'undefined' && exports || this;
+
   var doctype = '<?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">';
 
   function inlineImages(callback) {
@@ -8,21 +10,22 @@
       callback();
     }
     for (var i = 0; i < images.length; i++) {
-      var image = images[i];
-      var canvas = document.createElement('canvas');
-      var ctx = canvas.getContext('2d');
-      var img = new Image();
-      img.src = image.getAttribute('xlink:href');
-      img.onload = function() {
-        canvas.width = img.width;
-        canvas.height = img.height;
-        ctx.drawImage(img, 0, 0);
-        image.setAttribute('xlink:href', canvas.toDataURL('image/png'));
-        left--;
-        if (left == 0) {
-          callback();
+      (function(image) {
+        var canvas = document.createElement('canvas');
+        var ctx = canvas.getContext('2d');
+        var img = new Image();
+        img.src = image.getAttribute('xlink:href');
+        img.onload = function() {
+          canvas.width = img.width;
+          canvas.height = img.height;
+          ctx.drawImage(img, 0, 0);
+          image.setAttribute('xlink:href', canvas.toDataURL('image/png'));
+          left--;
+          if (left == 0) {
+            callback();
+          }
         }
-      }
+      })(images[i]);
     }
   }
 
@@ -59,10 +62,10 @@
     return defs;
   }
 
-  window.saveSvgAsPng = function(el, name, scaleFactor) {
+  out$.svgAsDataUri = function(el, scaleFactor, cb) {
     scaleFactor = scaleFactor || 1;
 
-    inlineImages(function(left) {
+    inlineImages(function() {
       var outer = document.createElement("div");
       var clone = el.cloneNode(true);
       var width = parseInt(clone.getAttribute("width"));
@@ -81,8 +84,17 @@
       clone.insertBefore(styles(clone), clone.firstChild);
 
       var svg = doctype + outer.innerHTML;
+      var uri = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(svg)));
+      if (cb) {
+        cb(uri);
+      }
+    });
+  }
+
+  out$.saveSvgAsPng = function(el, name, scaleFactor) {
+    out$.svgAsDataUri(el, scaleFactor, function(uri) {
       var image = new Image();
-      image.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(svg)));
+      image.src = uri;
       image.onload = function() {
         var canvas = document.createElement('canvas');
         canvas.width = image.width;

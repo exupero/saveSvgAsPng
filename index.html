@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+
+<input type=file id=file name="files[]" />
+<div id=result></div>
+<button id=save>Save as PNG</button>
+<div id=preview></div>
+
+<script src=http://code.jquery.com/jquery-latest.min.js></script>
+<script src=saveSvgAsPng.js></script>
+<script>
+  function handleFileSelect(evt) {
+    var files = evt.target.files;
+    for (var i = 0, f; f = files[i]; i++) {
+      var reader = new FileReader();
+      reader.onload = (function(file) {
+        return function(e) {
+          $('#result').html(e.target.result);
+          svgAsDataUri($('#result svg')[0], null, function(uri) {
+            $('#preview').append('<img src="' + uri + '" />');
+          });
+          $('#save').click(function() {
+            saveSvgAsPng($('#result svg')[0], 'test.png');
+          });
+        }
+      })(f);
+
+      reader.readAsText(f);
+    }
+  }
+
+  if (window.File && window.FileReader && window.FileList && window.Blob) {
+    document.getElementById('file').addEventListener('change', handleFileSelect, false);
+  }
+</script>

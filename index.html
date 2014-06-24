@@ -1,9 +1,40 @@
 <!DOCTYPE html>
 
-<input type=file id=file name="files[]" />
-<div id=result></div>
-<button id=save>Save as PNG</button>
-<div id=preview></div>
+<link rel=stylesheet href=bootstrap.min.css />
+<style>
+  svg, img {
+    border: 1px solid lightgray;
+  }
+</style>
+
+<div class=container>
+  <div class=row>
+    <div class=col-md-6>
+      <h2>Load from harddrive</h2>
+      <div>
+        <input type=file id=file name="files[]" />
+        <div id=result></div>
+
+        <h3>Preview</h3>
+        <button id=save>Save as PNG</button>
+        <div id=preview>No file selected.</div>
+      </div>
+    </div>
+
+    <div class=col-md-6>
+      <h2>Convert an inline SVG</h2>
+      <div>
+        <svg id=inline width=200 height=200>
+          <rect x=50 y=50 width=100 height=100></rect>
+        </svg>
+
+        <h3>Preview</h3>
+        <button id=save2>Save as PNG</button>
+        <div id=preview2></div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script src=http://code.jquery.com/jquery-latest.min.js></script>
 <script src=saveSvgAsPng.js></script>
@@ -16,7 +47,7 @@
         return function(e) {
           $('#result').html(e.target.result);
           svgAsDataUri($('#result svg')[0], null, function(uri) {
-            $('#preview').append('<img src="' + uri + '" />');
+            $('#preview').html('<img src="' + uri + '" />');
           });
           $('#save').click(function() {
             saveSvgAsPng($('#result svg')[0], 'test.png');
@@ -31,4 +62,12 @@
   if (window.File && window.FileReader && window.FileList && window.Blob) {
     document.getElementById('file').addEventListener('change', handleFileSelect, false);
   }
+
+  svgAsDataUri($('#inline')[0], null, function(uri) {
+    $('#preview2').html('<img src="' + uri + '" />');
+  });
+
+  $('#save2').click(function() {
+    saveSvgAsPng($('#inline')[0], 'test2.png');
+  });
 </script>

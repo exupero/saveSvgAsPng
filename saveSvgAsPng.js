@@ -70,10 +70,12 @@
       var clone = el.cloneNode(true);
       var width = parseInt(clone.getAttribute("width"));
       var height = parseInt(clone.getAttribute("height"));
+      
+      var xmlns = "http://www.w3.org/2000/xmlns/";
 
       clone.setAttribute("version", "1.1");
-      clone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
-      clone.setAttribute("xmlns:xlink", "http://www.w3.org/1999/xlink");
+      clone.setAttributeNS(xmlns, "xmlns", "http://www.w3.org/2000/svg");
+      clone.setAttributeNS(xmlns, "xmlns:xlink", "http://www.w3.org/1999/xlink");
       clone.setAttribute("width", width * scaleFactor);
       clone.setAttribute("height", height * scaleFactor);
       var scaling = document.createElement("g");

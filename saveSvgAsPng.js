@@ -30,8 +30,8 @@
   }
 
   function moveChildren(src, dest) {
-    while (src.children.length > 0) {
-      var child = src.children[0];
+    while (src.childNodes.length > 0) {
+      var child = src.childNodes[0];
       dest.appendChild(child);
     }
     return dest;

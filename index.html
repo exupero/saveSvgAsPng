@@ -24,6 +24,27 @@
   }
 </style>
 
+<script type=text/template id=inline-template>
+  <div class=row>
+    <div class=col-md-6>
+      <h2></h2>
+    </div>
+
+    <div class=col-md-6>
+      <h3>Preview <button class="save btn">Save as PNG</button></h3>
+    </div>
+  </div>
+
+  <div class=row>
+    <div class="canvas col-md-6">
+    </div>
+
+    <div class=col-md-6>
+      <div class=preview></div>
+    </div>
+  </div>
+</script>
+
 <div class=container>
   <ul>
     <li id=filereader>
@@ -50,75 +71,21 @@
     </li>
 
     <li id=inline>
-      <div class=row>
-        <div class=col-md-6>
-          <h2>Directly in the HTML</h2>
-        </div>
-
-        <div class=col-md-6>
-          <h3>Preview <button class="save btn">Save as PNG</button></h3>
-        </div>
-      </div>
-
-      <div class=row>
-        <div class=col-md-6>
-          <svg width=200 height=200>
-            <rect x=50 y=50 width=100 height=100></rect>
-          </svg>
-        </div>
-
-        <div class=col-md-6>
-          <div class=preview></div>
-        </div>
-      </div>
+      <svg width=200 height=200>
+        <rect x=50 y=50 width=100 height=100></rect>
+      </svg>
     </li>
 
     <li id=embedded-png>
-      <div class=row>
-        <div class=col-md-6>
-          <h2>With linked PNG images</h2>
-        </div>
-
-        <div class=col-md-6>
-          <h3>Preview <button class="save btn">Save as PNG</button></h3>
-        </div>
-      </div>
-
-      <div class=row>
-        <div class=col-md-6>
-          <svg width=200 height=200>
-            <image xlink:href=image.png x=50 y=50 width=100 height=100></image>
-          </svg>
-        </div>
-
-        <div class=col-md-6>
-          <div class=preview></div>
-        </div>
-      </div>
+      <svg width=200 height=200>
+        <image xlink:href=image.png x=50 y=50 width=100 height=100></image>
+      </svg>
     </li>
 
     <li id=embedded-svg>
-      <div class=row>
-        <div class=col-md-6>
-          <h2>With linked SVG images</h2>
-        </div>
-
-        <div class=col-md-6>
-          <h3>Preview <button class="save btn">Save as PNG</button></h3>
-        </div>
-      </div>
-
-      <div class=row>
-        <div class=col-md-6>
-          <svg width=200 height=200>
-            <image xlink:href=test.svg x=50 y=50 width=100 height=100></image>
-          </svg>
-        </div>
-
-        <div class=col-md-6>
-          <div class=preview></div>
-        </div>
-      </div>
+      <svg width=200 height=200>
+        <image xlink:href=test.svg x=50 y=50 width=100 height=100></image>
+      </svg>
     </li>
   </ul>
 </div>
@@ -147,14 +114,20 @@
     }
   }
 
-  function inlineTest($el) {
-    var svg = $el.find('svg')[0];
-    svgAsDataUri(svg, null, function(uri) {
-      $el.find('.preview').html('<img src="' + uri + '" />');
+  function inlineTest(title, $el) {
+    var svg = $el.html();
+    var template = $('#inline-template').html();
+    var row = $el.html(template);
+    row.find('h2').text(title);
+    row.find('.canvas').html(svg);
+
+    var canvas = row.find('svg')[0];
+    svgAsDataUri(canvas, null, function(uri) {
+      row.find('.preview').html('<img src="' + uri + '" />');
     });
 
-    $el.find('.save').click(function() {
-      saveSvgAsPng(svg, 'test.png');
+    row.find('.save').click(function() {
+      saveSvgAsPng(canvas, 'test.png');
     });
   }
 
@@ -162,7 +135,7 @@
     document.getElementById('file').addEventListener('change', handleFileSelect, false);
   }
 
-  inlineTest($('#inline'));
-  inlineTest($('#embedded-png'));
-  inlineTest($('#embedded-svg'));
+  inlineTest('Directly in the HTML', $('#inline'));
+  inlineTest('With linked PNG image', $('#embedded-png'));
+  inlineTest('With linked SVG image', $('#embedded-svg'));
 </script>

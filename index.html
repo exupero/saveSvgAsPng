@@ -2,38 +2,47 @@
 
 <link rel=stylesheet href=bootstrap.min.css />
 <style>
+  h2 {
+    margin-top: 0;
+  }
+
+  ul {
+    list-style-type: none;
+  }
+
+  ul li {
+    padding: 30px 20px;
+    border-bottom: 1px dashed gray;
+  }
+
   svg, img {
     border: 1px solid lightgray;
   }
 </style>
 
 <div class=container>
-  <div class=row>
-    <div class=col-md-6>
-      <h2>Load from harddrive</h2>
-      <div>
-        <input type=file id=file name="files[]" />
-        <div id=result></div>
+  <ul>
+    <li id=filereader>
+      <h2>Load from hard drive</h2>
+      <input type=file id=file name="files[]" />
+      <div class=load-target></div>
 
-        <h3>Preview</h3>
-        <button id=save>Save as PNG</button>
-        <div id=preview>No file selected.</div>
-      </div>
-    </div>
+      <h3>Preview</h3>
+      <button class=save>Save as PNG</button>
+      <div class=preview>No file selected.</div>
+    </li>
 
-    <div class=col-md-6>
-      <h2>Convert an inline SVG</h2>
-      <div>
-        <svg id=inline width=200 height=200>
-          <rect x=50 y=50 width=100 height=100></rect>
-        </svg>
+    <li id=inline>
+      <h2>Inline</h2>
+      <svg class=source width=200 height=200>
+        <rect x=50 y=50 width=100 height=100></rect>
+      </svg>
 
-        <h3>Preview</h3>
-        <button id=save2>Save as PNG</button>
-        <div id=preview2></div>
-      </div>
-    </div>
-  </div>
+      <h3>Preview</h3>
+      <button class=save>Save as PNG</button>
+      <div class=preview></div>
+    </li>
+  </ul>
 </div>
 
 <script src=http://code.jquery.com/jquery-latest.min.js></script>
@@ -45,16 +54,15 @@
       var reader = new FileReader();
       reader.onload = (function(file) {
         return function(e) {
-          $('#result').html(e.target.result);
-          svgAsDataUri($('#result svg')[0], null, function(uri) {
-            $('#preview').html('<img src="' + uri + '" />');
+          $('#filereader .load-target').html(e.target.result);
+          svgAsDataUri($('#filereader .load-target svg')[0], null, function(uri) {
+            $('#filereader .preview').html('<img src="' + uri + '" />');
           });
-          $('#save').click(function() {
-            saveSvgAsPng($('#result svg')[0], 'test.png');
+          $('#filereader .save').click(function() {
+            saveSvgAsPng($('#filereader .load-target svg')[0], 'test.png');
           });
         }
       })(f);
-
       reader.readAsText(f);
     }
   }
@@ -63,11 +71,11 @@
     document.getElementById('file').addEventListener('change', handleFileSelect, false);
   }
 
-  svgAsDataUri($('#inline')[0], null, function(uri) {
-    $('#preview2').html('<img src="' + uri + '" />');
+  svgAsDataUri($('#inline svg')[0], null, function(uri) {
+    $('#inline .preview').html('<img src="' + uri + '" />');
   });
 
-  $('#save2').click(function() {
-    saveSvgAsPng($('#inline')[0], 'test2.png');
+  $('#inline .save').click(function() {
+    saveSvgAsPng($('#inline svg')[0], 'test.png');
   });
 </script>

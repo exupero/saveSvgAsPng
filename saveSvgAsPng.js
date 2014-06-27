@@ -11,6 +11,10 @@
     }
     for (var i = 0; i < images.length; i++) {
       (function(image) {
+        var href = image.attributes['xlink:href'].nodeValue;
+        if (/^http/.test(href) && new RegExp('^' + window.location.host).test(href)) {
+          throw new Error("Cannot render embedded images linking to external hosts.");
+        }
         var canvas = document.createElement('canvas');
         var ctx = canvas.getContext('2d');
         var img = new Image();

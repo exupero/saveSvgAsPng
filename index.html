@@ -174,7 +174,7 @@
       svgAsDataUri(canvas, null, function(uri) {
         $sandbox.find('.preview').html('<img src="' + uri + '" />');
       });
-      $sandbox.find('.save').click(function() {
+      $sandbox.find('.save').unbind('click').click(function() {
         saveSvgAsPng(canvas, 'test.png');
       });
     } catch(err) {

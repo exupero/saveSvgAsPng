@@ -2,8 +2,12 @@
 
 <link rel=stylesheet href=bootstrap.min.css />
 <style>
-  h2 {
+  h2, h3 {
     margin-top: 0;
+  }
+
+  h3 .btn {
+    margin-top: -8px;
   }
 
   ul {
@@ -23,24 +27,98 @@
 <div class=container>
   <ul>
     <li id=filereader>
-      <h2>Load from hard drive</h2>
-      <input type=file id=file name="files[]" />
-      <div class=load-target></div>
+      <div class=row>
+        <div class=col-md-6>
+          <h2>Load from your hard drive</h2>
+        </div>
 
-      <h3>Preview</h3>
-      <button class=save>Save as PNG</button>
-      <div class=preview>No file selected.</div>
+        <div class=col-md-6>
+          <h3>Preview <button class="save btn">Save as PNG</button></h3>
+        </div>
+      </div>
+
+      <div class=row>
+        <div class=col-md-6>
+          <input type=file id=file name="files[]" />
+          <div class=load-target></div>
+        </div>
+
+        <div class=col-md-6>
+          <div class=preview>No file selected.</div>
+        </div>
+      </div>
     </li>
 
     <li id=inline>
-      <h2>Inline</h2>
-      <svg class=source width=200 height=200>
-        <rect x=50 y=50 width=100 height=100></rect>
-      </svg>
+      <div class=row>
+        <div class=col-md-6>
+          <h2>Directly in the HTML</h2>
+        </div>
 
-      <h3>Preview</h3>
-      <button class=save>Save as PNG</button>
-      <div class=preview></div>
+        <div class=col-md-6>
+          <h3>Preview <button class="save btn">Save as PNG</button></h3>
+        </div>
+      </div>
+
+      <div class=row>
+        <div class=col-md-6>
+          <svg width=200 height=200>
+            <rect x=50 y=50 width=100 height=100></rect>
+          </svg>
+        </div>
+
+        <div class=col-md-6>
+          <div class=preview></div>
+        </div>
+      </div>
+    </li>
+
+    <li id=embedded-png>
+      <div class=row>
+        <div class=col-md-6>
+          <h2>With linked PNG images</h2>
+        </div>
+
+        <div class=col-md-6>
+          <h3>Preview <button class="save btn">Save as PNG</button></h3>
+        </div>
+      </div>
+
+      <div class=row>
+        <div class=col-md-6>
+          <svg width=200 height=200>
+            <image xlink:href=image.png x=50 y=50 width=100 height=100></image>
+          </svg>
+        </div>
+
+        <div class=col-md-6>
+          <div class=preview></div>
+        </div>
+      </div>
+    </li>
+
+    <li id=embedded-svg>
+      <div class=row>
+        <div class=col-md-6>
+          <h2>With linked SVG images</h2>
+        </div>
+
+        <div class=col-md-6>
+          <h3>Preview <button class="save btn">Save as PNG</button></h3>
+        </div>
+      </div>
+
+      <div class=row>
+        <div class=col-md-6>
+          <svg width=200 height=200>
+            <image xlink:href=test.svg x=50 y=50 width=100 height=100></image>
+          </svg>
+        </div>
+
+        <div class=col-md-6>
+          <div class=preview></div>
+        </div>
+      </div>
     </li>
   </ul>
 </div>
@@ -49,17 +127,19 @@
 <script src=saveSvgAsPng.js></script>
 <script>
   function handleFileSelect(evt) {
+    var $el = $('#filereader');
     var files = evt.target.files;
     for (var i = 0, f; f = files[i]; i++) {
       var reader = new FileReader();
       reader.onload = (function(file) {
         return function(e) {
-          $('#filereader .load-target').html(e.target.result);
-          svgAsDataUri($('#filereader .load-target svg')[0], null, function(uri) {
-            $('#filereader .preview').html('<img src="' + uri + '" />');
+          $el.find('.load-target').html(e.target.result);
+          svgAsDataUri($el.find('.load-target svg')[0], null, function(uri) {
+            $el.find('input').hide()
+            $el.find('.preview').html('<img src="' + uri + '" />');
           });
-          $('#filereader .save').click(function() {
-            saveSvgAsPng($('#filereader .load-target svg')[0], 'test.png');
+          $el.find('.save').click(function() {
+            saveSvgAsPng($el.find('.load-target svg')[0], 'test.png');
           });
         }
       })(f);
@@ -67,15 +147,22 @@
     }
   }
 
+  function inlineTest($el) {
+    var svg = $el.find('svg')[0];
+    svgAsDataUri(svg, null, function(uri) {
+      $el.find('.preview').html('<img src="' + uri + '" />');
+    });
+
+    $el.find('.save').click(function() {
+      saveSvgAsPng(svg, 'test.png');
+    });
+  }
+
   if (window.File && window.FileReader && window.FileList && window.Blob) {
     document.getElementById('file').addEventListener('change', handleFileSelect, false);
   }
 
-  svgAsDataUri($('#inline svg')[0], null, function(uri) {
-    $('#inline .preview').html('<img src="' + uri + '" />');
-  });
-
-  $('#inline .save').click(function() {
-    saveSvgAsPng($('#inline svg')[0], 'test.png');
-  });
+  inlineTest($('#inline'));
+  inlineTest($('#embedded-png'));
+  inlineTest($('#embedded-svg'));
 </script>

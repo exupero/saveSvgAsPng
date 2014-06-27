@@ -22,6 +22,18 @@
   svg, img {
     border: 1px solid lightgray;
   }
+
+  textarea {
+    width: 100%;
+    height: 100px;
+  }
+
+  .error {
+    border: 1px solid red;
+    border-radius: 10px;
+    color: red;
+    padding: 8px 10px;
+  }
 </style>
 
 <script type=text/template id=inline-template>
@@ -87,6 +99,20 @@
         <image xlink:href=test.svg x=50 y=50 width=100 height=100></image>
       </svg>
     </li>
+
+    <li id=sandbox>
+      <h2>Sandbox</h2>
+
+      <textarea><svg></svg></textarea>
+      <br/>
+      <button class="render btn pull-right">Preview</button>
+      <div class=load-target style="margin-top:20px;"></div>
+
+      <br/>
+      <h3>Preview <button class="save btn">Save as PNG</button></h3>
+      <span class=error style="display:none;"></span>
+      <div class=preview></div>
+    </li>
   </ul>
 </div>
 
@@ -114,6 +140,10 @@
     }
   }
 
+  if (window.File && window.FileReader && window.FileList && window.Blob) {
+    document.getElementById('file').addEventListener('change', handleFileSelect, false);
+  }
+
   function inlineTest(title, $el) {
     var svg = $el.html();
     var template = $('#inline-template').html();
@@ -131,11 +161,24 @@
     });
   }
 
-  if (window.File && window.FileReader && window.FileList && window.Blob) {
-    document.getElementById('file').addEventListener('change', handleFileSelect, false);
-  }
-
   inlineTest('Directly in the HTML', $('#inline'));
   inlineTest('With linked PNG image', $('#embedded-png'));
   inlineTest('With linked SVG image', $('#embedded-svg'));
+
+  var $sandbox = $('#sandbox');
+  $sandbox.find('.render').click(function() {
+    $sandbox.find('.error').hide().text('');
+    $sandbox.find('.load-target').html($('#sandbox textarea').val());
+    var canvas = $sandbox.find('.load-target svg')[0];
+    try {
+      svgAsDataUri(canvas, null, function(uri) {
+        $sandbox.find('.preview').html('<img src="' + uri + '" />');
+      });
+      $sandbox.find('.save').click(function() {
+        saveSvgAsPng(canvas, 'test.png');
+      });
+    } catch(err) {
+      $sandbox.find('.error').show().text(err.message);
+    }
+  });
 </script>

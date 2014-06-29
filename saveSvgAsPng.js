@@ -33,14 +33,6 @@
     }
   }
 
-  function moveChildren(src, dest) {
-    while (src.childNodes.length > 0) {
-      var child = src.childNodes[0];
-      dest.appendChild(child);
-    }
-    return dest;
-  }
-
   function styles(dom) {
     var used = "";
     var sheets = document.styleSheets;
@@ -82,9 +74,7 @@
       clone.setAttributeNS(xmlns, "xmlns:xlink", "http://www.w3.org/1999/xlink");
       clone.setAttribute("width", width * scaleFactor);
       clone.setAttribute("height", height * scaleFactor);
-      var scaling = document.createElement("g");
-      scaling.setAttribute("transform", "scale(" + scaleFactor + ")");
-      clone.appendChild(moveChildren(clone, scaling));
+      clone.setAttribute("viewBox", "0 0 " + width + " " + height);
       outer.appendChild(clone);
 
       clone.insertBefore(styles(clone), clone.firstChild);

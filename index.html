@@ -100,6 +100,13 @@
       </svg>
     </li>
 
+    <li id=scaling>
+      <svg width=200 height=200>
+        <rect width=100 height=100></rect>
+        <image xlink:href=image.png x=50 y=50 width=100 height=100></image>
+      </svg>
+    </li>
+
     <li id=sandbox>
       <h2>Sandbox</h2>
 
@@ -144,7 +151,8 @@
     document.getElementById('file').addEventListener('change', handleFileSelect, false);
   }
 
-  function inlineTest(title, $el) {
+  function inlineTest(title, $el, scaling) {
+    scaling = scaling || null;
     var svg = $el.html();
     var template = $('#inline-template').html();
     var row = $el.html(template);
@@ -152,18 +160,19 @@
     row.find('.canvas').html(svg);
 
     var canvas = row.find('svg')[0];
-    svgAsDataUri(canvas, null, function(uri) {
+    svgAsDataUri(canvas, scaling, function(uri) {
       row.find('.preview').html('<img src="' + uri + '" />');
     });
 
     row.find('.save').click(function() {
-      saveSvgAsPng(canvas, 'test.png');
+      saveSvgAsPng(canvas, 'test.png', scaling);
     });
   }
 
   inlineTest('Directly in the HTML', $('#inline'));
   inlineTest('With linked PNG image', $('#embedded-png'));
   inlineTest('With linked SVG image', $('#embedded-svg'));
+  inlineTest('At a higher resolution', $('#scaling'), 2);
 
   var $sandbox = $('#sandbox');
   $sandbox.find('.render').click(function() {

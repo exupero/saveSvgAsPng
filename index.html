@@ -13,6 +13,7 @@
 
   ul {
     list-style-type: none;
+    padding: 0;
   }
 
   ul li {
@@ -59,7 +60,26 @@
 </script>
 
 <div class=container>
+  <h1>saveSvgAsPng</h1>
+  <p>This page tests various features of saveSvgAsPng.</p>
+  <p>You can test your own SVG code in the Sandbox. If something doesn't work as expected, you can <a href="https://github.com/exupero/saveSvgAsPng/issues">file an issue on GitHub</a>.</p>
+
   <ul>
+    <li id=sandbox>
+      <h2>Sandbox</h2>
+      <p>Paste you SVG below to see how it renders.</p>
+
+      <textarea><svg></svg></textarea>
+      <br/>
+      <button class="render btn">Preview</button>
+      <div class=load-target style="margin-top:20px;"></div>
+
+      <br/>
+      <h3>Preview <button class="save btn">Save as PNG</button></h3>
+      <span class=error style="display:none;"></span>
+      <div class=preview></div>
+    </li>
+
     <li id=filereader>
       <div class=row>
         <div class=col-md-6>
@@ -106,20 +126,6 @@
         <rect width=100 height=100></rect>
         <image xlink:href=image.png x=50 y=50 width=100 height=100></image>
       </svg>
-    </li>
-
-    <li id=sandbox>
-      <h2>Sandbox</h2>
-
-      <textarea><svg></svg></textarea>
-      <br/>
-      <button class="render btn">Preview</button>
-      <div class=load-target style="margin-top:20px;"></div>
-
-      <br/>
-      <h3>Preview <button class="save btn">Save as PNG</button></h3>
-      <span class=error style="display:none;"></span>
-      <div class=preview></div>
     </li>
   </ul>
 </div>

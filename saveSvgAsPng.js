@@ -43,9 +43,14 @@
       for (var j = 0; j < rules.length; j++) {
         var rule = rules[j];
         if (typeof(rule.style) != "undefined") {
-          var elems = dom.querySelectorAll(rule.selectorText);
-          if (elems.length > 0) {
-            used += rule.selectorText + " { " + rule.style.cssText + " }\n";
+          try {
+            var elems = dom.querySelectorAll(rule.selectorText);
+            if (elems.length > 0) {
+              used += rule.selectorText + " { " + rule.style.cssText + " }\n";
+            }
+          } catch(e) {
+            console.warn("Could not apply CSS rule for '" + rule.selectorText + "' to PNG export");
+            continue;
           }
         }
       }

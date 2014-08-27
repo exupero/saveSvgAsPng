@@ -36,29 +36,21 @@
   }
 
   function styles(dom) {
-    var used = "";
+    var css = "";
     var sheets = document.styleSheets;
     for (var i = 0; i < sheets.length; i++) {
       var rules = sheets[i].cssRules;
       for (var j = 0; j < rules.length; j++) {
         var rule = rules[j];
         if (typeof(rule.style) != "undefined") {
-          try {
-            var elems = dom.querySelectorAll(rule.selectorText);
-            if (elems.length > 0) {
-              used += rule.selectorText + " { " + rule.style.cssText + " }\n";
-            }
-          } catch(e) {
-            console.warn("Could not apply CSS rule for '" + rule.selectorText + "' to PNG export");
-            continue;
-          }
+          css += rule.selectorText + " { " + rule.style.cssText + " }\n";
         }
       }
     }
 
     var s = document.createElement('style');
     s.setAttribute('type', 'text/css');
-    s.innerHTML = "<![CDATA[\n" + used + "\n]]>";
+    s.innerHTML = "<![CDATA[\n" + css + "\n]]>";
 
     var defs = document.createElement('defs');
     defs.appendChild(s);

@@ -63,8 +63,8 @@
     inlineImages(function() {
       var outer = document.createElement("div");
       var clone = el.cloneNode(true);
-      var width = parseInt(clone.getAttribute("width"));
-      var height = parseInt(clone.getAttribute("height"));
+      var width = parseInt(clone.style.width);
+      var height = parseInt(clone.style.height);
 
       var xmlns = "http://www.w3.org/2000/xmlns/";
 

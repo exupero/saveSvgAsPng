@@ -3,6 +3,10 @@
 
   var doctype = '<?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">';
 
+  function isExternal(url) {
+    return url && url.lastIndexOf('http',0) == 0 && !url.lastIndexOf(window.location.host,0) == 0;
+  }
+
   function inlineImages(callback) {
     var images = document.querySelectorAll('svg image');
     var left = images.length;
@@ -13,8 +17,9 @@
       (function(image) {
         if (image.getAttribute('xlink:href')) {
           var href = image.getAttribute('xlink:href').value;
-          if (/^http/.test(href) && !(new RegExp('^' + window.location.host).test(href))) {
-            throw new Error("Cannot render embedded images linking to external hosts.");
+          if (isExternal(href)) {
+            console.warn("Cannot render embedded images linking to external hosts.");
+            return;
           }
         }
         var canvas = document.createElement('canvas');
@@ -39,6 +44,10 @@
     var css = "";
     var sheets = document.styleSheets;
     for (var i = 0; i < sheets.length; i++) {
+      if (isExternal(sheets[i].href)) {
+        console.warn("Cannot include styles from other hosts.");
+        continue;
+      }
       var rules = sheets[i].cssRules;
       for (var j = 0; j < rules.length; j++) {
         var rule = rules[j];

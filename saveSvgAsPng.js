@@ -49,10 +49,12 @@
         continue;
       }
       var rules = sheets[i].cssRules;
-      for (var j = 0; j < rules.length; j++) {
-        var rule = rules[j];
-        if (typeof(rule.style) != "undefined") {
-          css += rule.selectorText + " { " + rule.style.cssText + " }\n";
+      if (rules != null) {
+        for (var j = 0; j < rules.length; j++) {
+          var rule = rules[j];
+          if (typeof(rule.style) != "undefined") {
+            css += rule.selectorText + " { " + rule.style.cssText + " }\n";
+          }
         }
       }
     }

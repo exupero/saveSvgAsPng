@@ -4,7 +4,7 @@
   var doctype = '<?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">';
 
   function isExternal(url) {
-    return url && url.lastIndexOf('http',0) == 0 && !url.lastIndexOf(window.location.host,0) == 0;
+    return url && url.lastIndexOf('http',0) == 0 && url.lastIndexOf(window.location.host) == -1;
   }
 
   function inlineImages(callback) {

@@ -36,6 +36,13 @@
             callback();
           }
         }
+        img.onerror = function() {
+          console.log("Could not load "+image.getAttribute('xlink:href'));
+          left--;
+          if (left == 0) {
+            callback();
+          }
+        }
       })(images[i]);
     }
   }

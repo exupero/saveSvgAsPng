@@ -15,9 +15,9 @@
     }
     for (var i = 0; i < images.length; i++) {
       (function(image) {
-        if (image.getAttribute('xlink:href')) {
-          var href = image.getAttribute('xlink:href').value;
-          if (isExternal(href)) {
+        var href = image.getAttribute('xlink:href');
+        if (href) {
+          if (isExternal(href.value)) {
             console.warn("Cannot render embedded images linking to external hosts.");
             return;
           }
@@ -25,7 +25,8 @@
         var canvas = document.createElement('canvas');
         var ctx = canvas.getContext('2d');
         var img = new Image();
-        img.src = image.getAttribute('xlink:href');
+        href = href || image.getAttribute('href');
+        img.src = href;
         img.onload = function() {
           canvas.width = img.width;
           canvas.height = img.height;
@@ -37,7 +38,7 @@
           }
         }
         img.onerror = function() {
-          console.log("Could not load "+image.getAttribute('xlink:href'));
+          console.log("Could not load "+href);
           left--;
           if (left == 0) {
             callback();

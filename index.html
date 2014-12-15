@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <meta http-equiv="content-type" content="text/html; charset=UTF8">
+<title>saveSvgAsPng</title>
 
 <link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,400,300,600' rel='stylesheet' type='text/css' />
 <link rel=stylesheet href=bootstrap.min.css />
@@ -41,6 +42,14 @@
   #sized-with-css svg {
     width: 200px;
     height: 200px;
+  }
+
+  #selectors-prefixed svg rect {
+    fill: blue;
+  }
+
+  rect.css-styled {
+    fill: green !important;
   }
 </style>
 
@@ -151,6 +160,13 @@
         <image xlink:href=image.png x=50 y=50 width=100 height=100></image>
       </svg>
     </li>
+
+    <li id=selectors-prefixed>
+      <svg width=200 height=200>
+        <rect x=0 y=50 width=100 height=100></rect>
+        <rect class=css-styled x=100 y=50 width=100 height=100></rect>
+      </svg>
+    </li>
   </ul>
 </div>
 
@@ -206,6 +222,9 @@
   inlineTest('Sized with style', $('#sized-with-style'));
   inlineTest('Sized with CSS', $('#sized-with-css'));
   inlineTest('At a higher resolution', $('#scaling'), {scale: 2});
+  inlineTest('When CSS styling selectors are prefixed', $('#selectors-prefixed'), {
+    selectorRemap: function(s) {return s.replace('#selectors-prefixed ', '')}
+  });
 
   var $sandbox = $('#sandbox');
   $sandbox.find('.render').click(function() {

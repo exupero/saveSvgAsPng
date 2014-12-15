@@ -48,7 +48,7 @@
     }
   }
 
-  function styles(dom) {
+  function styles(el, selectorRemap) {
     var css = "";
     var sheets = document.styleSheets;
     for (var i = 0; i < sheets.length; i++) {
@@ -61,19 +61,16 @@
         for (var j = 0; j < rules.length; j++) {
           var rule = rules[j];
           if (typeof(rule.style) != "undefined") {
-            css += rule.selectorText + " { " + rule.style.cssText + " }\n";
+            var matches = el.querySelectorAll(rule.selectorText);
+            if (matches.length > 0) {
+              var selector = selectorRemap ? selectorRemap(rule.selectorText) : rule.selectorText;
+              css += selector + " { " + rule.style.cssText + " }\n";
+            }
           }
         }
       }
     }
-
-    var s = document.createElement('style');
-    s.setAttribute('type', 'text/css');
-    s.innerHTML = "<![CDATA[\n" + css + "\n]]>";
-
-    var defs = document.createElement('defs');
-    defs.appendChild(s);
-    return defs;
+    return css;
   }
 
   out$.svgAsDataUri = function(el, options, cb) {
@@ -104,7 +101,13 @@
       clone.setAttribute("viewBox", "0 0 " + width + " " + height);
       outer.appendChild(clone);
 
-      clone.insertBefore(styles(clone), clone.firstChild);
+      var css = styles(el, options.selectorRemap);
+      var s = document.createElement('style');
+      s.setAttribute('type', 'text/css');
+      s.innerHTML = "<![CDATA[\n" + css + "\n]]>";
+      var defs = document.createElement('defs');
+      defs.appendChild(s);
+      clone.insertBefore(defs, clone.firstChild);
 
       var svg = doctype + outer.innerHTML;
       var uri = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(svg)));

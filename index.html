@@ -182,8 +182,7 @@
     document.getElementById('file').addEventListener('change', handleFileSelect, false);
   }
 
-  function inlineTest(title, $el, scaling) {
-    scaling = scaling || null;
+  function inlineTest(title, $el, options) {
     var svg = $el.html();
     var template = $('#inline-template').html();
     var row = $el.html(template);
@@ -191,12 +190,12 @@
     row.find('.canvas').html(svg);
 
     var canvas = row.find('svg')[0];
-    svgAsDataUri(canvas, scaling, function(uri) {
+    svgAsDataUri(canvas, options, function(uri) {
       row.find('.preview').html('<img src="' + uri + '" />');
     });
 
     row.find('.save').click(function() {
-      saveSvgAsPng(canvas, 'test.png', scaling);
+      saveSvgAsPng(canvas, 'test.png', options);
     });
   }
 
@@ -206,7 +205,7 @@
   inlineTest('Sized with pixels', $('#sized-with-pixels'));
   inlineTest('Sized with style', $('#sized-with-style'));
   inlineTest('Sized with CSS', $('#sized-with-css'));
-  inlineTest('At a higher resolution', $('#scaling'), 2);
+  inlineTest('At a higher resolution', $('#scaling'), {scale: 2});
 
   var $sandbox = $('#sandbox');
   $sandbox.find('.render').click(function() {

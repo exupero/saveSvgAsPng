@@ -76,8 +76,9 @@
     return defs;
   }
 
-  out$.svgAsDataUri = function(el, scaleFactor, cb) {
-    scaleFactor = scaleFactor || 1;
+  out$.svgAsDataUri = function(el, options, cb) {
+    options = options || {};
+    options.scale = options.scale || 1;
 
     inlineImages(el, function() {
       var outer = document.createElement("div");
@@ -98,8 +99,8 @@
       clone.setAttribute("version", "1.1");
       clone.setAttributeNS(xmlns, "xmlns", "http://www.w3.org/2000/svg");
       clone.setAttributeNS(xmlns, "xmlns:xlink", "http://www.w3.org/1999/xlink");
-      clone.setAttribute("width", width * scaleFactor);
-      clone.setAttribute("height", height * scaleFactor);
+      clone.setAttribute("width", width * options.scale);
+      clone.setAttribute("height", height * options.scale);
       clone.setAttribute("viewBox", "0 0 " + width + " " + height);
       outer.appendChild(clone);
 
@@ -113,8 +114,9 @@
     });
   }
 
-  out$.saveSvgAsPng = function(el, name, scaleFactor) {
-    out$.svgAsDataUri(el, scaleFactor, function(uri) {
+  out$.saveSvgAsPng = function(el, name, options) {
+    options = options || {};
+    out$.svgAsDataUri(el, options, function(uri) {
       var image = new Image();
       image.src = uri;
       image.onload = function() {

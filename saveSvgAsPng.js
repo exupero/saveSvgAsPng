@@ -18,7 +18,7 @@
         var href = image.getAttribute('xlink:href');
         if (href) {
           if (isExternal(href.value)) {
-            console.warn("Cannot render embedded images linking to external hosts.");
+            console.warn("Cannot render embedded images linking to external hosts: "+href.value);
             return;
           }
         }
@@ -53,7 +53,7 @@
     var sheets = document.styleSheets;
     for (var i = 0; i < sheets.length; i++) {
       if (isExternal(sheets[i].href)) {
-        console.warn("Cannot include styles from other hosts.");
+        console.warn("Cannot include styles from other hosts: "+sheets[i].href);
         continue;
       }
       var rules = sheets[i].cssRules;

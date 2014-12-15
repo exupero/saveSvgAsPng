@@ -7,8 +7,8 @@
     return url && url.lastIndexOf('http',0) == 0 && url.lastIndexOf(window.location.host) == -1;
   }
 
-  function inlineImages(callback) {
-    var images = document.querySelectorAll('svg image');
+  function inlineImages(el, callback) {
+    var images = el.querySelectorAll('image');
     var left = images.length;
     if (left == 0) {
       callback();
@@ -79,7 +79,7 @@
   out$.svgAsDataUri = function(el, scaleFactor, cb) {
     scaleFactor = scaleFactor || 1;
 
-    inlineImages(function() {
+    inlineImages(el, function() {
       var outer = document.createElement("div");
       var clone = el.cloneNode(true);
       var width = parseInt(

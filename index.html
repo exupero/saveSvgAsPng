@@ -167,6 +167,14 @@
         <rect class=css-styled x=100 y=50 width=100 height=100></rect>
       </svg>
     </li>
+
+    <li id=group>
+      <svg width=200 height=200>
+        <g id=sub-group transform="translate(40,40)">
+          <rect x=10 y=10 width=100 height=100></rect>
+        </g>
+      </svg>
+    </li>
   </ul>
 </div>
 
@@ -198,20 +206,20 @@
     document.getElementById('file').addEventListener('change', handleFileSelect, false);
   }
 
-  function inlineTest(title, $el, options) {
+  function inlineTest(title, $el, saveOptions, testOptions) {
     var svg = $el.html();
     var template = $('#inline-template').html();
     var row = $el.html(template);
     row.find('h2').text(title);
     row.find('.canvas').html(svg);
 
-    var canvas = row.find('svg')[0];
-    svgAsDataUri(canvas, options, function(uri) {
+    var canvas = row.find(testOptions && testOptions.selector || 'svg')[0];
+    svgAsDataUri(canvas, saveOptions, function(uri) {
       row.find('.preview').html('<img src="' + uri + '" />');
     });
 
     row.find('.save').click(function() {
-      saveSvgAsPng(canvas, 'test.png', options);
+      saveSvgAsPng(canvas, 'test.png', saveOptions);
     });
   }
 
@@ -224,6 +232,9 @@
   inlineTest('At a higher resolution', $('#scaling'), {scale: 2});
   inlineTest('When CSS styling selectors are prefixed', $('#selectors-prefixed'), {
     selectorRemap: function(s) {return s.replace('#selectors-prefixed ', '')}
+  });
+  inlineTest('Exporting a group within an SVG', $('#group'), null, {
+    selector: '#sub-group'
   });
 
   var $sandbox = $('#sandbox');

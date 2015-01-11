@@ -78,22 +78,25 @@
   out$.svgAsDataUri = function(el, options, cb) {
     options = options || {};
     options.scale = options.scale || 1;
+    var xmlns = "http://www.w3.org/2000/xmlns/";
 
     inlineImages(el, function() {
       var outer = document.createElement("div");
       var clone = el.cloneNode(true);
-      var width = parseInt(
-        clone.getAttribute('width')
-          || clone.style.width
-          || out$.getComputedStyle(el).getPropertyValue('width')
-      );
-      var height = parseInt(
-        clone.getAttribute('height')
-          || clone.style.height
-          || out$.getComputedStyle(el).getPropertyValue('height')
-      );
+      var width, height;
+      if(el.tagName == 'svg') {
+        width = parseInt(clone.getAttribute('width') || clone.style.width || out$.getComputedStyle(el).getPropertyValue('width'));
+        height = parseInt(clone.getAttribute('height') || clone.style.height || out$.getComputedStyle(el).getPropertyValue('height'));
+      } else {
+        var box = el.getBBox();
+        width = box.x + box.width;
+        height = box.y + box.height;
+        clone.setAttribute('transform', clone.getAttribute('transform').replace(/translate\(.*?\)/, ''));
 
-      var xmlns = "http://www.w3.org/2000/xmlns/";
+        var svg = document.createElementNS('http://www.w3.org/2000/svg','svg')
+        svg.appendChild(clone)
+        clone = svg;
+      }
 
       clone.setAttribute("version", "1.1");
       clone.setAttributeNS(xmlns, "xmlns", "http://www.w3.org/2000/svg");

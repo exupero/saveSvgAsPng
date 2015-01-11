@@ -65,6 +65,8 @@
             if (matches.length > 0) {
               var selector = selectorRemap ? selectorRemap(rule.selectorText) : rule.selectorText;
               css += selector + " { " + rule.style.cssText + " }\n";
+            } else if(rule.cssText.match(/^@font-face/)) {
+              css += rule.cssText + '\n';
             }
           }
         }

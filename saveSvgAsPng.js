@@ -61,8 +61,13 @@
         for (var j = 0; j < rules.length; j++) {
           var rule = rules[j];
           if (typeof(rule.style) != "undefined") {
-            var matches = el.querySelectorAll(rule.selectorText);
-            if (matches.length > 0) {
+            var match = null;
+            try {
+              match = el.querySelector(rule.selectorText);
+            } catch(err) {
+              console.warn('Invalid CSS selector "' + rule.selectorText + '"', err);
+            }
+            if (match) {
               var selector = selectorRemap ? selectorRemap(rule.selectorText) : rule.selectorText;
               css += selector + " { " + rule.style.cssText + " }\n";
             } else if(rule.cssText.match(/^@font-face/)) {

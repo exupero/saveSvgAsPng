@@ -5,6 +5,13 @@
 <link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,400,300,600' rel='stylesheet' type='text/css' />
 <link rel=stylesheet href=bootstrap.min.css />
 <style>
+  @font-face {
+    font-family: 'Stalemate';
+    font-style: normal;
+    font-weight: 400;
+    src: url(stalemate.ttf) format('truetype');
+  }
+
   input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button {
     padding: 15px;
   }
@@ -179,6 +186,12 @@
         </g>
       </svg>
     </li>
+
+    <li id=custom-font>
+      <svg width=200 height=200>
+        <text x=100 y=100 text-anchor=middle dy=14 style="font-family:'Stalemate';font-size:36pt;">Custom Fonts</text>
+      </svg>
+    </li>
   </ul>
 </div>
 
@@ -240,6 +253,7 @@
   inlineTest('Exporting a group within an SVG', $('#group'), null, {
     selector: '#sub-group'
   });
+  inlineTest('With custom fonts', $('#custom-font'));
 
   var $sandbox = $('#sandbox');
   $sandbox.find('.render').click(function() {

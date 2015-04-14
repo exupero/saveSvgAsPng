@@ -143,6 +143,9 @@
         a.download = name;
         a.href = canvas.toDataURL('image/png');
         document.body.appendChild(a);
+        a.addEventListener("click", function(e) {
+          a.parentNode.removeChild(a);
+        });
         a.click();
       }
     });

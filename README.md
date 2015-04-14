@@ -1,6 +1,16 @@
 saveSvgAsPng
 ============
 
+Installation
+------------
+
+```
+npm install save-svg-as-png
+```
+
+Usage
+-----
+
 To save a PNG, include the script `saveSvgAsPng.js` in your page, then call the `saveSvgAsPng` function with an SVG node and a filename:
 
 ```javascript

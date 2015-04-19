@@ -192,6 +192,12 @@
         <text x=100 y=100 text-anchor=middle dy=14 style="font-family:'Stalemate';font-size:36pt;">Custom Fonts</text>
       </svg>
     </li>
+
+    <li id=percentage-size>
+      <svg width="100%" height="100%">
+        <rect x=25 y=25 width=100 height=100></rect>
+      </svg>
+    </li>
   </ul>
 </div>
 
@@ -254,6 +260,7 @@
     selector: '#sub-group'
   });
   inlineTest('With custom fonts', $('#custom-font'));
+  inlineTest('Percentage Height and Width', $('#percentage-size'));
 
   var $sandbox = $('#sandbox');
   $sandbox.find('.render').click(function() {

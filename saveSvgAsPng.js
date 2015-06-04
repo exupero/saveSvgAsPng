@@ -91,8 +91,14 @@
       var width, height;
       if(el.tagName == 'svg') {
         var box = el.getBoundingClientRect();
-        width = box.width;
-        height = box.height;
+        width = box.width ||
+          parseInt(clone.getAttribute('width') ||
+          clone.style.width ||
+          out$.getComputedStyle(el).getPropertyValue('width'));
+        height = box.height ||
+          parseInt(clone.getAttribute('height') ||
+          clone.style.height ||
+          out$.getComputedStyle(el).getPropertyValue('height'));
       } else {
         var box = el.getBBox();
         width = box.x + box.width;

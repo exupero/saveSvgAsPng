@@ -15,7 +15,7 @@
     }
     for (var i = 0; i < images.length; i++) {
       (function(image) {
-        var href = image.getAttribute('xlink:href');
+        var href = image.getAttributeNS("http://www.w3.org/1999/xlink", "href");
         if (href) {
           if (isExternal(href.value)) {
             console.warn("Cannot render embedded images linking to external hosts: "+href.value);
@@ -31,7 +31,7 @@
           canvas.width = img.width;
           canvas.height = img.height;
           ctx.drawImage(img, 0, 0);
-          image.setAttribute('xlink:href', canvas.toDataURL('image/png'));
+          image.setAttributeNS("http://www.w3.org/1999/xlink", "href", canvas.toDataURL('image/png'));
           left--;
           if (left == 0) {
             callback();

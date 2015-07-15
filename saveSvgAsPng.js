@@ -99,6 +99,16 @@
           parseInt(clone.getAttribute('height') ||
           clone.style.height ||
           out$.getComputedStyle(el).getPropertyValue('height'));
+        if (width === undefined || 
+        width === null || 
+        isNaN(parseFloat(width))) {
+      	  width = 0;
+        }
+        if (height === undefined || 
+        height === null || 
+        isNaN(parseFloat(height))) {
+      	  height = 0;
+        }
       } else {
         var box = el.getBBox();
         width = box.x + box.width;

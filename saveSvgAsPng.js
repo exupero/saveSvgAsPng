@@ -100,13 +100,13 @@
           clone.style.height ||
           out$.getComputedStyle(el).getPropertyValue('height'));
         if (width === undefined || 
-        width === null || 
-        isNaN(parseFloat(width))) {
+            width === null || 
+            isNaN(parseFloat(width))) {
       	  width = 0;
         }
         if (height === undefined || 
-        height === null || 
-        isNaN(parseFloat(height))) {
+            height === null || 
+            isNaN(parseFloat(height))) {
       	  height = 0;
         }
       } else {

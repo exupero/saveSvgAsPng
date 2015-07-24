@@ -91,12 +91,12 @@
       var width, height;
       if(el.tagName == 'svg') {
         var box = el.getBoundingClientRect();
-        width = box.width ||
-          parseInt(clone.getAttribute('width') ||
+        width = parseInt(clone.getAttribute('width') ||
+          box.width ||
           clone.style.width ||
           out$.getComputedStyle(el).getPropertyValue('width'));
-        height = box.height ||
-          parseInt(clone.getAttribute('height') ||
+        height = parseInt(clone.getAttribute('height') ||
+          box.height ||
           clone.style.height ||
           out$.getComputedStyle(el).getPropertyValue('height'));
         if (width === undefined || 

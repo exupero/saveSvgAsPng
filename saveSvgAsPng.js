@@ -148,7 +148,6 @@
     options = options || {};
     out$.svgAsDataUri(el, options, function(uri) {
       var image = new Image();
-      image.src = uri;
       image.onload = function() {
         var canvas = document.createElement('canvas');
         canvas.width = image.width;
@@ -165,6 +164,7 @@
         });
         a.click();
       }
+      image.src = uri;
     });
   }
 })();

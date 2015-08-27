@@ -94,11 +94,11 @@
         width = parseInt(clone.getAttribute('width') ||
           box.width ||
           clone.style.width ||
-          out$.getComputedStyle(el).getPropertyValue('width'));
+          window.getComputedStyle(el).getPropertyValue('width'));
         height = parseInt(clone.getAttribute('height') ||
           box.height ||
           clone.style.height ||
-          out$.getComputedStyle(el).getPropertyValue('height'));
+          window.getComputedStyle(el).getPropertyValue('height'));
         if (width === undefined || 
             width === null || 
             isNaN(parseFloat(width))) {

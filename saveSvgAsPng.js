@@ -93,12 +93,12 @@
         var box = el.getBoundingClientRect();
         width = (clone.getAttribute('width') !== null && !clone.getAttribute('width').match(/%$/) && parseInt(clone.getAttribute('width'))) ||
           box.width ||
-          clone.style.width ||
-          window.getComputedStyle(el).getPropertyValue('width');
-        height = parseInt(clone.getAttribute('height') ||
+          parseInt(clone.style.width) ||
+          parseInt(window.getComputedStyle(el).getPropertyValue('width'));
+        height = (clone.getAttribute('height') !== null && !clone.getAttribute('height').match(/%$/) && parseInt(clone.getAttribute('height'))) ||
           box.height ||
-          clone.style.height ||
-          window.getComputedStyle(el).getPropertyValue('height'));
+          parseInt(clone.style.height) ||
+          parseInt(window.getComputedStyle(el).getPropertyValue('height'));
         if (width === undefined || 
             width === null || 
             isNaN(parseFloat(width))) {

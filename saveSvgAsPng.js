@@ -88,17 +88,17 @@
     inlineImages(el, function() {
       var outer = document.createElement("div");
       var clone = el.cloneNode(true);
-      var width, height;
+      var width, height, viewBoxWidth, viewBoxHeight;
       if(el.tagName == 'svg') {
         var box = el.getBoundingClientRect();
-        width = parseInt(clone.getAttribute('width') ||
+        width = (clone.getAttribute('width') !== null && !clone.getAttribute('width').match(/%$/) && parseInt(clone.getAttribute('width'))) ||
           box.width ||
-          clone.style.width ||
-          window.getComputedStyle(el).getPropertyValue('width'));
-        height = parseInt(clone.getAttribute('height') ||
+          parseInt(clone.style.width) ||
+          parseInt(window.getComputedStyle(el).getPropertyValue('width'));
+        height = (clone.getAttribute('height') !== null && !clone.getAttribute('height').match(/%$/) && parseInt(clone.getAttribute('height'))) ||
           box.height ||
-          clone.style.height ||
-          window.getComputedStyle(el).getPropertyValue('height'));
+          parseInt(clone.style.height) ||
+          parseInt(window.getComputedStyle(el).getPropertyValue('height'));
         if (width === undefined || 
             width === null || 
             isNaN(parseFloat(width))) {
@@ -109,11 +109,16 @@
             isNaN(parseFloat(height))) {
       	  height = 0;
         }
+        viewBoxWidth = el.viewBox.baseVal.width === 0 ? width : el.viewBox.baseVal.width;
+        viewBoxHeight = el.viewBox.baseVal.height === 0 ? height : el.viewBox.baseVal.height;
+
       } else {
         var box = el.getBBox();
         width = box.x + box.width;
         height = box.y + box.height;
         clone.setAttribute('transform', clone.getAttribute('transform').replace(/translate\(.*?\)/, ''));
+        viewBoxWidth = width;
+        viewBoxHeight =  height;
 
         var svg = document.createElementNS('http://www.w3.org/2000/svg','svg')
         svg.appendChild(clone)
@@ -125,7 +130,8 @@
       clone.setAttributeNS(xmlns, "xmlns:xlink", "http://www.w3.org/1999/xlink");
       clone.setAttribute("width", width * options.scale);
       clone.setAttribute("height", height * options.scale);
-      clone.setAttribute("viewBox", "0 0 " + width + " " + height);
+      clone.setAttribute("viewBox", "0 0 " + viewBoxWidth + " " + viewBoxHeight);
+
       outer.appendChild(clone);
 
       var css = styles(el, options.selectorRemap);

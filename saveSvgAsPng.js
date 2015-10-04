@@ -80,6 +80,13 @@
     return css;
   }
 
+  function getDimension(el, clone, dim) {
+    return (clone.getAttribute(dim) !== null && !clone.getAttribute(dim).match(/%$/) && parseInt(clone.getAttribute(dim))) ||
+      el.getBoundingClientRect()[dim] ||
+      parseInt(clone.style[dim]) ||
+      parseInt(window.getComputedStyle(el).getPropertyValue(dim));
+  }
+
   out$.svgAsDataUri = function(el, options, cb) {
     options = options || {};
     options.scale = options.scale || 1;
@@ -90,28 +97,16 @@
       var clone = el.cloneNode(true);
       var width, height, viewBoxWidth, viewBoxHeight;
       if(el.tagName == 'svg') {
-        var box = el.getBoundingClientRect();
-        width = (clone.getAttribute('width') !== null && !clone.getAttribute('width').match(/%$/) && parseInt(clone.getAttribute('width'))) ||
-          box.width ||
-          parseInt(clone.style.width) ||
-          parseInt(window.getComputedStyle(el).getPropertyValue('width'));
-        height = (clone.getAttribute('height') !== null && !clone.getAttribute('height').match(/%$/) && parseInt(clone.getAttribute('height'))) ||
-          box.height ||
-          parseInt(clone.style.height) ||
-          parseInt(window.getComputedStyle(el).getPropertyValue('height'));
-        if (width === undefined || 
-            width === null || 
-            isNaN(parseFloat(width))) {
-      	  width = 0;
+        width = getDimension(el, clone, 'width');
+        height = getDimension(el, clone, 'height');
+        if (typeof width === "undefined" || width === null || isNaN(parseFloat(width))) {
+          width = 0;
         }
-        if (height === undefined || 
-            height === null || 
-            isNaN(parseFloat(height))) {
-      	  height = 0;
+        if (typeof height === "undefined" || height === null || isNaN(parseFloat(height))) {
+          height = 0;
         }
-        viewBoxWidth = el.viewBox.baseVal.width === 0 ? width : el.viewBox.baseVal.width;
-        viewBoxHeight = el.viewBox.baseVal.height === 0 ? height : el.viewBox.baseVal.height;
-
+        viewBoxWidth = el.viewBox.baseVal && el.viewBox.baseVal.width !== 0 ? el.viewBox.baseVal.width : width;
+        viewBoxHeight = el.viewBox.baseVal && el.viewBox.baseVal.height !== 0 ? el.viewBox.baseVal.height : height;
       } else {
         var box = el.getBBox();
         width = box.x + box.width;

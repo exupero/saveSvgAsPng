@@ -212,7 +212,7 @@
       reader.onload = (function(file) {
         return function(e) {
           $el.find('.load-target').html(e.target.result);
-          svgAsDataUri($el.find('.load-target svg')[0], null, function(uri) {
+          svgAsPngUri($el.find('.load-target svg')[0], null, function(uri) {
             $el.find('input').hide()
             $el.find('.preview').html('<img src="' + uri + '" />');
           });
@@ -237,7 +237,7 @@
     row.find('.canvas').html(svg);
 
     var canvas = row.find(testOptions && testOptions.selector || 'svg')[0];
-    svgAsDataUri(canvas, saveOptions, function(uri) {
+    svgAsPngUri(canvas, saveOptions, function(uri) {
       row.find('.preview').html('<img src="' + uri + '" />');
     });
 
@@ -268,7 +268,7 @@
     $sandbox.find('.load-target').html($('#sandbox textarea').val());
     var canvas = $sandbox.find('.load-target svg')[0];
     try {
-      svgAsDataUri(canvas, null, function(uri) {
+      svgAsPngUri(canvas, null, function(uri) {
         $sandbox.find('.preview').html('<img src="' + uri + '" />');
       });
       $sandbox.find('.save').unbind('click').click(function() {

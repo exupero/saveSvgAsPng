@@ -1,15 +1,12 @@
-saveSvgAsPng
-============
+# saveSvgAsPng
 
-Installation
-------------
+## Installation
 
 ```
 npm install save-svg-as-png
 ```
 
-Usage
------
+## Usage
 
 To save a PNG, include the script `saveSvgAsPng.js` in your page, then call the `saveSvgAsPng` function with an SVG node and a filename:
 
@@ -33,9 +30,22 @@ svgAsDataUri(document.getElementById("diagram"), {}, function(uri) {
 });
 ```
 
+If you want a dataURI of a PNG generated from an SVG, you can call `svgAsPngUri` with an SVG node, options, and a callback:
+
+```javascript
+svgAsPngUri(document.getElementById("diagram"), {}, function(uri) {
+  ...
+});
+```
+
 Compatible with browserify.
 
-Browser Support
----------------
+### Options
 
-saveSvgAsPng relies on the canvas element's `toDataURL`, which throws a SecurityError in IE.
+- `backgroundColor` — Creates a PNG with the given background color. Defaults to transparent.
+- `scale` — Changes the resolution of the output PNG. Defaults to `1`, the same dimensions as the source SVG.
+- `selectorRemap` — A function that takes a CSS selector and produces its replacement in the CSS that's inlined into the SVG. Useful if your SVG style selectors are scoped by ancestor elements in your HTML document.
+
+## Support
+
+Internet Explorer is not supported due to the `SecurityError` it throws when calling `toDataURL` on a canvas that's been written to.

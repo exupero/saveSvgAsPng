@@ -187,6 +187,14 @@
       </svg>
     </li>
 
+    <li id=background-color>
+      <svg width=200 height=200>
+        <g id=sub-group transform="translate(40,40)">
+          <rect x=10 y=10 width=100 height=100></rect>
+        </g>
+      </svg>
+    </li>
+
     <li id=custom-font>
       <svg width=200 height=200>
         <text x=100 y=100 text-anchor=middle dy=14 style="font-family:'Stalemate';font-size:36pt;">Custom Fonts</text>
@@ -259,6 +267,7 @@
   inlineTest('Exporting a group within an SVG', $('#group'), null, {
     selector: '#sub-group'
   });
+  inlineTest('Background color', $('#background-color'), {backgroundColor: 'lightblue'});
   inlineTest('With custom fonts', $('#custom-font'));
   inlineTest('Percentage Height and Width', $('#percentage-size'));
 

@@ -107,7 +107,7 @@
         }
         viewBoxWidth = el.viewBox.baseVal && el.viewBox.baseVal.width !== 0 ? el.viewBox.baseVal.width : width;
         viewBoxHeight = el.viewBox.baseVal && el.viewBox.baseVal.height !== 0 ? el.viewBox.baseVal.height : height;
-      } else {
+      } else if(el.getBBox) {
         var box = el.getBBox();
         width = box.x + box.width;
         height = box.y + box.height;
@@ -118,6 +118,9 @@
         var svg = document.createElementNS('http://www.w3.org/2000/svg','svg')
         svg.appendChild(clone)
         clone = svg;
+      } else {
+        console.error('Attempted to render non-SVG element', el);
+        return;
       }
 
       clone.setAttribute("version", "1.1");

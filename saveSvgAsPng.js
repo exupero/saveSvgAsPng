@@ -97,8 +97,8 @@
       var clone = el.cloneNode(true);
       var width, height, viewBoxWidth, viewBoxHeight;
       if(el.tagName == 'svg') {
-        width = getDimension(el, clone, 'width');
-        height = getDimension(el, clone, 'height');
+        width = options.width || getDimension(el, clone, 'width');
+        height = options.height || getDimension(el, clone, 'height');
         if (typeof width === "undefined" || width === null || isNaN(parseFloat(width))) {
           width = 0;
         }
@@ -128,7 +128,12 @@
       clone.setAttributeNS(xmlns, "xmlns:xlink", "http://www.w3.org/1999/xlink");
       clone.setAttribute("width", width * options.scale);
       clone.setAttribute("height", height * options.scale);
-      clone.setAttribute("viewBox", "0 0 " + viewBoxWidth + " " + viewBoxHeight);
+      clone.setAttribute("viewBox", [
+        options.left || 0,
+        options.top || 0,
+        viewBoxWidth,
+        viewBoxHeight
+      ].join(" "));
 
       outer.appendChild(clone);
 

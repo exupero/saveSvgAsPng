@@ -195,15 +195,23 @@
       </svg>
     </li>
 
-    <li id=custom-font>
-      <svg width=200 height=200>
-        <text x=100 y=100 text-anchor=middle dy=14 style="font-family:'Stalemate';font-size:36pt;">Custom Fonts</text>
-      </svg>
-    </li>
-
     <li id=percentage-size>
       <svg width="100%" height="100%">
         <rect x=25 y=25 width=100 height=100></rect>
+      </svg>
+    </li>
+
+    <li id=pan-and-zoom>
+      <svg width=200 height=200>
+        <g transform="scale(2)">
+          <rect x=10 y=10 width=100 height=100></rect>
+        </g>
+      </svg>
+    </li>
+
+    <li id=custom-font>
+      <svg width=200 height=200>
+        <text x=100 y=100 text-anchor=middle dy=14 style="font-family:'Stalemate';font-size:36pt;">Custom Fonts</text>
       </svg>
     </li>
   </ul>
@@ -268,8 +276,14 @@
     selector: '#sub-group'
   });
   inlineTest('Background color', $('#background-color'), {backgroundColor: 'lightblue'});
-  inlineTest('With custom fonts', $('#custom-font'));
   inlineTest('Percentage Height and Width', $('#percentage-size'));
+  inlineTest('Pan and Zoom', $('#pan-and-zoom'), {
+    left: -50,
+    top: -50,
+    width: 300,
+    height: 300
+  });
+  inlineTest('With custom fonts', $('#custom-font'));
 
   var $sandbox = $('#sandbox');
   $sandbox.find('.render').click(function() {

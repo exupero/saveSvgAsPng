@@ -81,10 +81,12 @@
   }
 
   function getDimension(el, clone, dim) {
-    return (clone.getAttribute(dim) !== null && !clone.getAttribute(dim).match(/%$/) && parseInt(clone.getAttribute(dim))) ||
+    var v = (el.viewBox.baseVal && el.viewBox.baseVal[dim]) ||
+      (clone.getAttribute(dim) !== null && !clone.getAttribute(dim).match(/%$/) && parseInt(clone.getAttribute(dim))) ||
       el.getBoundingClientRect()[dim] ||
       parseInt(clone.style[dim]) ||
       parseInt(window.getComputedStyle(el).getPropertyValue(dim));
+    return (typeof v === 'undefined' || v === null || isNaN(parseFloat(v))) ? 0 : v;
   }
 
   out$.svgAsDataUri = function(el, options, cb) {
@@ -95,25 +97,15 @@
     inlineImages(el, function() {
       var outer = document.createElement("div");
       var clone = el.cloneNode(true);
-      var width, height, viewBoxWidth, viewBoxHeight;
+      var width, height;
       if(el.tagName == 'svg') {
         width = options.width || getDimension(el, clone, 'width');
         height = options.height || getDimension(el, clone, 'height');
-        if (typeof width === "undefined" || width === null || isNaN(parseFloat(width))) {
-          width = 0;
-        }
-        if (typeof height === "undefined" || height === null || isNaN(parseFloat(height))) {
-          height = 0;
-        }
-        viewBoxWidth = el.viewBox.baseVal && el.viewBox.baseVal.width !== 0 ? el.viewBox.baseVal.width : width;
-        viewBoxHeight = el.viewBox.baseVal && el.viewBox.baseVal.height !== 0 ? el.viewBox.baseVal.height : height;
       } else if(el.getBBox) {
         var box = el.getBBox();
         width = box.x + box.width;
         height = box.y + box.height;
         clone.setAttribute('transform', clone.getAttribute('transform').replace(/translate\(.*?\)/, ''));
-        viewBoxWidth = width;
-        viewBoxHeight =  height;
 
         var svg = document.createElementNS('http://www.w3.org/2000/svg','svg')
         svg.appendChild(clone)
@@ -131,8 +123,8 @@
       clone.setAttribute("viewBox", [
         options.left || 0,
         options.top || 0,
-        viewBoxWidth,
-        viewBoxHeight
+        width,
+        height
       ].join(" "));
 
       outer.appendChild(clone);

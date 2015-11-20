@@ -89,6 +89,14 @@
     return (typeof v === 'undefined' || v === null || isNaN(parseFloat(v))) ? 0 : v;
   }
 
+  function reEncode(data) {
+    data = encodeURIComponent(data);
+    data = data.replace(/%([0-9A-F]{2})/g, function(match, p1) {
+      return String.fromCharCode('0x'+p1);
+    });
+    return decodeURIComponent(data);
+  }
+
   out$.svgAsDataUri = function(el, options, cb) {
     options = options || {};
     options.scale = options.scale || 1;
@@ -138,8 +146,7 @@
       clone.insertBefore(defs, clone.firstChild);
 
       var svg = doctype + outer.innerHTML;
-      // encode then decode to handle `btoa` on Unicode; see MDN for `btoa`.
-      var uri = 'data:image/svg+xml;base64,' + window.btoa(decodeURIComponent(encodeURIComponent(svg)));
+      var uri = 'data:image/svg+xml;base64,' + window.btoa(reEncode(svg));
       if (cb) {
         cb(uri);
       }

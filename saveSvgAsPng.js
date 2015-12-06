@@ -92,7 +92,8 @@
   function reEncode(data) {
     data = encodeURIComponent(data);
     data = data.replace(/%([0-9A-F]{2})/g, function(match, p1) {
-      return String.fromCharCode('0x'+p1);
+      var c = String.fromCharCode('0x'+p1);
+      return c === '%' ? '%25' : c;
     });
     return decodeURIComponent(data);
   }

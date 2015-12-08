@@ -52,10 +52,6 @@
     var css = "";
     var sheets = document.styleSheets;
     for (var i = 0; i < sheets.length; i++) {
-      if (isExternal(sheets[i].href)) {
-        console.warn("Cannot include styles from other hosts: "+sheets[i].href);
-        continue;
-      }
       var rules = sheets[i].cssRules;
       if (rules != null) {
         for (var j = 0; j < rules.length; j++) {

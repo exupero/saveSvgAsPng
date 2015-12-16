@@ -52,7 +52,13 @@
     var css = "";
     var sheets = document.styleSheets;
     for (var i = 0; i < sheets.length; i++) {
-      var rules = sheets[i].cssRules;
+      try {
+        var rules = sheets[i].cssRules;
+      } catch (e) {
+        console.warn("Stylesheet could not be loaded: "+sheets[i].href);
+        continue;
+      }
+
       if (rules != null) {
         for (var j = 0; j < rules.length; j++) {
           var rule = rules[j];

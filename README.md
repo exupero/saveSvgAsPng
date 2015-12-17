@@ -40,7 +40,7 @@ svgAsPngUri(document.getElementById("diagram"), {}, function(uri) {
 });
 ```
 
-Compatible with browserify.
+Compatible with [browserify](http://browserify.org/) and [requirejs](http://requirejs.org).
 
 ### Options
 

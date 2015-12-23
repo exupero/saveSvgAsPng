@@ -169,8 +169,14 @@
           context.fillRect(0, 0, canvas.width, canvas.height);
         }
         context.drawImage(image, 0, 0);
-        var a = document.createElement('a');
-        cb(canvas.toDataURL('image/png'));
+        var a = document.createElement('a'), png;
+        try {
+          png = canvas.toDataURL('image/png');
+        } catch (e if e instanceof SecurityError) {
+          console.error("Rendered SVG images cannot be downloaded in this browser.");
+          return;
+        }
+        cb(png);
       }
       image.src = uri;
     });

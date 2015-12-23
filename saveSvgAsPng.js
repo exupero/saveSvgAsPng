@@ -172,9 +172,13 @@
         var a = document.createElement('a'), png;
         try {
           png = canvas.toDataURL('image/png');
-        } catch (e if e instanceof SecurityError) {
-          console.error("Rendered SVG images cannot be downloaded in this browser.");
-          return;
+        } catch (e) {
+          if (e instanceof SecurityError) {
+            console.error("Rendered SVG images cannot be downloaded in this browser.");
+            return;
+          } else {
+            throw e;
+          }
         }
         cb(png);
       }

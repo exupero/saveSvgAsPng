@@ -173,7 +173,7 @@
         try {
           png = canvas.toDataURL('image/png');
         } catch (e) {
-          if (e instanceof SecurityError) {
+          if (e.name == "SecurityError" || e instanceof SecurityError) {
             console.error("Rendered SVG images cannot be downloaded in this browser.");
             return;
           } else {

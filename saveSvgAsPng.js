@@ -83,7 +83,7 @@
   }
 
   function getDimension(el, clone, dim) {
-    var v = (el.viewBox.baseVal && el.viewBox.baseVal[dim]) ||
+    var v = (el.viewBox && el.viewBox.baseVal && el.viewBox.baseVal[dim]) ||
       (clone.getAttribute(dim) !== null && !clone.getAttribute(dim).match(/%$/) && parseInt(clone.getAttribute(dim))) ||
       el.getBoundingClientRect()[dim] ||
       parseInt(clone.style[dim]) ||
@@ -206,5 +206,5 @@
       return out$;
     });
   }
-  
+
 })();

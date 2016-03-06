@@ -240,6 +240,13 @@
       </svg>
     </li>
 
+    <li id=opacity>
+      <svg width=200 height=200>
+        <rect x=50 y=50 width=100 height=100 fill="green"></rect>
+        <rect x=60 y=60 width=100 height=100 fill="blue" opacity="0.5"></rect>
+      </svg>
+    </li>
+
     <li id=custom-font>
       <svg width=200 height=200>
         <text x=100 y=100 text-anchor=middle dy=14 style="font-family:'Stalemate';font-size:36pt;">Custom Fonts</text>
@@ -317,6 +324,7 @@
   inlineTest('With Unicode characters', $('#unicode'));
   inlineTest('With gradients', $('#gradient'));
   inlineTest('With foreign objects', $('#foreign-object'));
+  inlineTest('With opacity', $('#opacity'));
   inlineTest('With custom fonts', $('#custom-font'));
 
   var $sandbox = $('#sandbox');

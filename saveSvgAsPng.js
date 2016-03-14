@@ -63,12 +63,22 @@
         for (var j = 0; j < rules.length; j++) {
           var rule = rules[j];
           if (typeof(rule.style) != "undefined") {
-            var match = null;
+            var match, selectorText;
+
             try {
-              match = el.querySelector(rule.selectorText);
+              selectorText = rule.selectorText;
             } catch(err) {
-              console.warn('Invalid CSS selector "' + rule.selectorText + '"', err);
+              console.warn('The following CSS rule has an invalid selector: "' + rule + '"', err);
             }
+
+            try {
+              if (selectorText) {
+                match = el.querySelector(selectorText);
+              }
+            } catch(err) {
+              console.warn('Invalid CSS selector "' + selectorText + '"', err);
+            }
+
             if (match) {
               var selector = selectorRemap ? selectorRemap(rule.selectorText) : rule.selectorText;
               css += selector + " { " + rule.style.cssText + " }\n";
@@ -206,5 +216,4 @@
       return out$;
     });
   }
-
 })();

@@ -111,6 +111,10 @@
   }
 
   out$.svgAsDataUri = function(el, options, cb) {
+    if(!el){
+      throw new Error('first argument to `svgAsDataUri` must be a DOM element, is', el);
+    }
+
     options = options || {};
     options.scale = options.scale || 1;
     var xmlns = "http://www.w3.org/2000/xmlns/";
@@ -167,6 +171,10 @@
   }
 
   out$.svgAsPngUri = function(el, options, cb) {
+    if(!el){
+      throw new Error('first argument to `svgAsPngUri` must be a DOM element, is', el);
+    }
+
     out$.svgAsDataUri(el, options, function(uri) {
       var image = new Image();
       image.onload = function() {
@@ -197,6 +205,10 @@
   }
 
   out$.saveSvgAsPng = function(el, name, options) {
+    if(!el){
+      throw new Error('first argument to `saveSvgAsPng` must be a DOM element, is', el);
+    }
+
     options = options || {};
     out$.svgAsPngUri(el, options, function(uri) {
       var a = document.createElement('a');

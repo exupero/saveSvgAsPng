@@ -3,11 +3,23 @@
 
   var doctype = '<?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">';
 
+  function isElement(obj) {
+    return obj instanceof HTMLElement || obj instanceof SVGElement;
+  }
+
+  function requireDomNode(el) {
+    if (!isElement(el)) {
+      throw new Error('an HTMLElement or SVGElement is required; got ' + el);
+    }
+  }
+
   function isExternal(url) {
     return url && url.lastIndexOf('http',0) == 0 && url.lastIndexOf(window.location.host) == -1;
   }
 
   function inlineImages(el, callback) {
+    requireDomNode(el);
+
     var images = el.querySelectorAll('image');
     var left = images.length;
     if (left == 0) {
@@ -111,9 +123,7 @@
   }
 
   out$.svgAsDataUri = function(el, options, cb) {
-    if(!el){
-      throw new Error('first argument to `svgAsDataUri` must be a DOM element, is', el);
-    }
+    requireDomNode(el);
 
     options = options || {};
     options.scale = options.scale || 1;
@@ -171,9 +181,7 @@
   }
 
   out$.svgAsPngUri = function(el, options, cb) {
-    if(!el){
-      throw new Error('first argument to `svgAsPngUri` must be a DOM element, is', el);
-    }
+    requireDomNode(el);
 
     out$.svgAsDataUri(el, options, function(uri) {
       var image = new Image();
@@ -205,9 +213,7 @@
   }
 
   out$.saveSvgAsPng = function(el, name, options) {
-    if(!el){
-      throw new Error('first argument to `saveSvgAsPng` must be a DOM element, is', el);
-    }
+    requireDomNode(el);
 
     options = options || {};
     out$.svgAsPngUri(el, options, function(uri) {

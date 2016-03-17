@@ -20,11 +20,15 @@
   function inlineImages(el, callback) {
     requireDomNode(el);
 
-    var images = el.querySelectorAll('image');
-    var left = images.length;
-    if (left == 0) {
-      callback();
-    }
+    var images = el.querySelectorAll('image'),
+        left = images.length,
+        checkDone = function() {
+          if (left === 0) {
+            callback();
+          }
+        };
+
+    checkDone();
     for (var i = 0; i < images.length; i++) {
       (function(image) {
         var href = image.getAttributeNS("http://www.w3.org/1999/xlink", "href");
@@ -38,23 +42,24 @@
         var ctx = canvas.getContext('2d');
         var img = new Image();
         href = href || image.getAttribute('href');
-        img.src = href;
-        img.onload = function() {
-          canvas.width = img.width;
-          canvas.height = img.height;
-          ctx.drawImage(img, 0, 0);
-          image.setAttributeNS("http://www.w3.org/1999/xlink", "href", canvas.toDataURL('image/png'));
-          left--;
-          if (left == 0) {
-            callback();
+        if (href) {
+          img.src = href;
+          img.onload = function() {
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
+            image.setAttributeNS("http://www.w3.org/1999/xlink", "href", canvas.toDataURL('image/png'));
+            left--;
+            checkDone();
           }
-        }
-        img.onerror = function() {
-          console.log("Could not load "+href);
-          left--;
-          if (left == 0) {
-            callback();
+          img.onerror = function() {
+            console.log("Could not load "+href);
+            left--;
+            checkDone();
           }
+        } else {
+          left--;
+          checkDone();
         }
       })(images[i]);
     }

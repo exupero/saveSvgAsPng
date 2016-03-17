@@ -156,8 +156,12 @@
       }
 
       clone.setAttribute("version", "1.1");
-      clone.setAttributeNS(xmlns, "xmlns", "http://www.w3.org/2000/svg");
-      clone.setAttributeNS(xmlns, "xmlns:xlink", "http://www.w3.org/1999/xlink");
+      if (!clone.getAttribute('xmlns')) {
+        clone.setAttributeNS(xmlns, "xmlns", "http://www.w3.org/2000/svg");
+      }
+      if (!clone.getAttribute('xmlns:xlink')) {
+        clone.setAttributeNS(xmlns, "xmlns:xlink", "http://www.w3.org/1999/xlink");
+      }
       clone.setAttribute("width", width * options.scale);
       clone.setAttribute("height", height * options.scale);
       clone.setAttribute("viewBox", [
@@ -212,6 +216,9 @@
           }
         }
         cb(png);
+      }
+      image.onerror = function(error) {
+        console.error('There was an error loading the data URI as an image', error);
       }
       image.src = uri;
     });

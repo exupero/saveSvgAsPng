@@ -63,7 +63,13 @@
     fill: green !important;
   }
 
-  [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak, .ng-hide:not(.ng-hide-animate) {
+  /* Invalid selectors */
+
+  [ng\:cloak] {
+    display: block;
+  }
+
+  ng\:form {
     display: block;
   }
 </style>

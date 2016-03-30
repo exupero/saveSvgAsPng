@@ -224,19 +224,32 @@
     });
   }
 
+  function download(name, uri) {
+    var a = document.createElement('a');
+    a.download = name;
+    a.href = uri;
+    document.body.appendChild(a);
+    a.addEventListener("click", function(e) {
+      a.parentNode.removeChild(a);
+    });
+    a.click();
+  }
+
+  out$.saveSvg = function(el, name, options) {
+    requireDomNode(el);
+
+    options = options || {};
+    out$.svgAsDataUri(el, options, function(uri) {
+      download(name, uri);
+    });
+  }
+
   out$.saveSvgAsPng = function(el, name, options) {
     requireDomNode(el);
 
     options = options || {};
     out$.svgAsPngUri(el, options, function(uri) {
-      var a = document.createElement('a');
-      a.download = name;
-      a.href = uri;
-      document.body.appendChild(a);
-      a.addEventListener("click", function(e) {
-        a.parentNode.removeChild(a);
-      });
-      a.click();
+      download(name, uri);
     });
   }
 

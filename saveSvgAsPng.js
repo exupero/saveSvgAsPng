@@ -171,6 +171,11 @@
         height
       ].join(" "));
 
+      var fos = clone.querySelectorAll('foreignObject > *');
+      for (var i = 0; i < fos.length; i++) {
+        fos[i].setAttributeNS(xmlns, "xmlns", "http://www.w3.org/1999/xhtml");
+      }
+
       outer.appendChild(clone);
 
       var css = styles(el, options.selectorRemap);

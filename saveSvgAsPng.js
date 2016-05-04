@@ -173,6 +173,8 @@
         clone.setAttribute("height", height * options.scale);
       }
 
+
+
       clone.setAttribute("viewBox", [
         options.left || 0,
         options.top || 0,

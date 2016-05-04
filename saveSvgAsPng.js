@@ -164,7 +164,7 @@
         clone.setAttributeNS(xmlns, "xmlns:xlink", "http://www.w3.org/1999/xlink");
       }
 
-      if (responsive) {
+      if (options.responsive) {
         clone.removeAttribute('width');
         clone.removeAttribute('height');
         clone.setAttribute('preserveAspectRatio', 'xMinYMin meet');

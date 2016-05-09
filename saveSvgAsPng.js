@@ -132,6 +132,7 @@
 
     options = options || {};
     options.scale = options.scale || 1;
+    options.responsive = options.responsive || false;
     var xmlns = "http://www.w3.org/2000/xmlns/";
 
     inlineImages(el, function() {
@@ -162,8 +163,16 @@
       if (!clone.getAttribute('xmlns:xlink')) {
         clone.setAttributeNS(xmlns, "xmlns:xlink", "http://www.w3.org/1999/xlink");
       }
-      clone.setAttribute("width", width * options.scale);
-      clone.setAttribute("height", height * options.scale);
+
+      if (options.responsive) {
+        clone.removeAttribute('width');
+        clone.removeAttribute('height');
+        clone.setAttribute('preserveAspectRatio', 'xMinYMin meet');
+      } else {
+        clone.setAttribute("width", width * options.scale);
+        clone.setAttribute("height", height * options.scale);
+      }
+
       clone.setAttribute("viewBox", [
         options.left || 0,
         options.top || 0,

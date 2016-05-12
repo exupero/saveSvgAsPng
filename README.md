@@ -42,6 +42,8 @@ svgAsPngUri(document.getElementById("diagram"), {}, function(uri) {
 
 Compatible with [browserify](http://browserify.org/) and [requirejs](http://requirejs.org).
 
+If you want to use TypeScript, necessary [type definitions](https://github.com/martianov/typed-save-svg-as-png) are available in [Typings](https://github.com/typings/typings) [public registry](https://github.com/typings/registry).
+
 ### Options
 
 - `backgroundColor` — Creates a PNG with the given background color. Defaults to transparent.

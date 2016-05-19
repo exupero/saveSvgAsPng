@@ -182,7 +182,9 @@
 
       var fos = clone.querySelectorAll('foreignObject > *');
       for (var i = 0; i < fos.length; i++) {
-        fos[i].setAttributeNS(xmlns, "xmlns", "http://www.w3.org/1999/xhtml");
+        if (!fos[i].getAttributeNS('xml', 'xmlns')) {
+          fos[i].setAttributeNS(xmlns, "xmlns", "http://www.w3.org/1999/xhtml");
+        }
       }
 
       outer.appendChild(clone);
@@ -231,8 +233,12 @@
         }
         cb(png);
       }
-      image.onerror = function(error) {
-        console.error('There was an error loading the data URI as an image', error);
+      image.onerror = function() {
+        console.error(
+          'There was an error loading the data URI as an image on the following SVG\n',
+          window.atob(uri.slice(26)), '\n',
+          "Open the following link to see browser's diagnosis\n",
+          uri);
       }
       image.src = uri;
     });

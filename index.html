@@ -239,9 +239,16 @@
 
     <li id=foreign-object>
       <svg width=200 height=200>
-        <rect x=50 y=50 width=100 height=100 fill="lightblue"></rect>
         <foreignobject x=50 y=50 width=50 height=100>
           <div>Foreign Object</div>
+        </foreignobject>
+      </svg>
+    </li>
+
+    <li id=xmlns-override>
+      <svg width=200 height=200>
+        <foreignobject x=50 y=50 width=50 height=100>
+          <div xml:xmlns="http://www.w3.org/2000/xmlns/">Foreign Object</div>
         </foreignobject>
       </svg>
     </li>
@@ -331,6 +338,7 @@
   inlineTest('With gradients', $('#gradient'));
   inlineTest('With foreign objects', $('#foreign-object'));
   inlineTest('With opacity', $('#opacity'));
+  inlineTest('When setting xmlns on foreign object children', $('#xmlns-override'));
   inlineTest('With custom fonts', $('#custom-font'));
 
   var $sandbox = $('#sandbox');

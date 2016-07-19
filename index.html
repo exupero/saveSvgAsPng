@@ -260,6 +260,12 @@
       </svg>
     </li>
 
+    <li id=entities>
+      <svg width=200 height=200>
+        <text x=50 y=100>&quot;&amp;&cent;&nbsp;&pound;&raquo;&frac14;&Ccedil;</text>
+      </svg>
+    </li>
+
     <li id=custom-font>
       <svg width=200 height=200>
         <text x=100 y=100 text-anchor=middle dy=14 style="font-family:'Stalemate';font-size:36pt;">Custom Fonts</text>
@@ -339,6 +345,7 @@
   inlineTest('With foreign objects', $('#foreign-object'));
   inlineTest('With opacity', $('#opacity'));
   inlineTest('When setting xmlns on foreign object children', $('#xmlns-override'));
+  inlineTest('When using HTML entites', $('#entities'));
   inlineTest('With custom fonts', $('#custom-font'));
 
   var $sandbox = $('#sandbox');

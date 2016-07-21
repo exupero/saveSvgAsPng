@@ -208,6 +208,9 @@
   out$.svgAsPngUri = function(el, options, cb) {
     requireDomNode(el);
 
+    options.encoderType = options.encoderType || 'image/png';
+    options.encoderOptions = options.encoderOptions || 0.8;
+
     out$.svgAsDataUri(el, options, function(uri) {
       var image = new Image();
       image.onload = function() {
@@ -222,7 +225,7 @@
         context.drawImage(image, 0, 0);
         var a = document.createElement('a'), png;
         try {
-          png = canvas.toDataURL('image/png');
+          png = canvas.toDataURL(options.encoderType, options.encoderOptions);
         } catch (e) {
           if ((typeof SecurityError !== 'undefined' && e instanceof SecurityError) || e.name == "SecurityError") {
             console.error("Rendered SVG images cannot be downloaded in this browser.");

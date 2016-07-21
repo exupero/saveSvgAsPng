@@ -53,6 +53,8 @@ If you want to use TypeScript, necessary [type definitions](https://github.com/m
 - `selectorRemap` — A function that takes a CSS selector and produces its replacement in the CSS that's inlined into the SVG. Useful if your SVG style selectors are scoped by ancestor elements in your HTML document.
 - `top` - Specify the viewbox's top position. Defaults to 0.
 - `width` - Specify the image's width. Defaults to the viewbox's width if given, or the element's non-percentage width, or the element's bounding box's width, or the element's CSS width, or the computed style's width, or 0.
+- `encoderType` - A DOMString indicating the image format. The default type is image/png.
+- `encoderOptions` - A Number between 0 and 1 indicating image quality. The default is 0.8
 
 ## Support
 

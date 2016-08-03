@@ -252,10 +252,8 @@
     a.download = name;
     a.href = uri;
     document.body.appendChild(a);
-    a.addEventListener("click", function(e) {
-      a.parentNode.removeChild(a);
-    });
     a.click();
+    a.parentNode.removeChild(a);
   }
 
   out$.saveSvg = function(el, name, options) {

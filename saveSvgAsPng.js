@@ -208,6 +208,7 @@
   out$.svgAsPngUri = function(el, options, cb) {
     requireDomNode(el);
 
+    options = options || {};
     options.encoderType = options.encoderType || 'image/png';
     options.encoderOptions = options.encoderOptions || 0.8;
 

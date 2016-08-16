@@ -250,12 +250,27 @@
   }
 
   function download(name, uri) {
-    var a = document.createElement('a');
-    a.download = name;
-    a.href = uri;
-    document.body.appendChild(a);
-    a.click();
-    a.parentNode.removeChild(a);
+    if (navigator.msSaveOrOpenBlob) {
+      navigator.msSaveOrOpenBlob(uriToBlob(uri), name);
+    } else {
+      var a = document.createElement('a');
+      a.download = name;
+      a.href = uri;
+      document.body.appendChild(a);
+      a.click();
+      a.parentNode.removeChild(a);
+    }
+  }
+
+  function uriToBlob(uri) {
+    var byteString = window.atob(uri.split(',')[1]);
+    var mimeString = uri.split(',')[0].split(':')[1].split(';')[0]
+    var buffer = new ArrayBuffer(byteString.length);
+    var intArray = new Uint8Array(buffer);
+    for (var i = 0; i < byteString.length; i++) {
+      intArray[i] = byteString.charCodeAt(i);
+    }
+    return new Blob([buffer], {type: mimeString});
   }
 
   out$.saveSvg = function(el, name, options) {

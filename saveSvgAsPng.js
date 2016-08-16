@@ -41,6 +41,7 @@
         var canvas = document.createElement('canvas');
         var ctx = canvas.getContext('2d');
         var img = new Image();
+        img.crossOrigin="anonymous";
         href = href || image.getAttribute('href');
         if (href) {
           img.src = href;

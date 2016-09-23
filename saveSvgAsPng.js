@@ -137,7 +137,6 @@
     var xmlns = "http://www.w3.org/2000/xmlns/";
 
     inlineImages(el, function() {
-      var outer = document.createElement("div");
       var clone = el.cloneNode(true);
       var width, height;
       if(el.tagName == 'svg') {
@@ -183,12 +182,10 @@
 
       var fos = clone.querySelectorAll('foreignObject > *');
       for (var i = 0; i < fos.length; i++) {
-        if (!fos[i].getAttributeNS('xml', 'xmlns')) {
+        if (!fos[i].getAttribute('xmlns')) {
           fos[i].setAttributeNS(xmlns, "xmlns", "http://www.w3.org/1999/xhtml");
         }
       }
-
-      outer.appendChild(clone);
 
       var css = styles(el, options.selectorRemap);
       var s = document.createElement('style');
@@ -198,7 +195,7 @@
       defs.appendChild(s);
       clone.insertBefore(defs, clone.firstChild);
 
-      var svg = doctype + outer.innerHTML;
+      var svg = doctype + new XMLSerializer().serializeToString(clone);
       var uri = 'data:image/svg+xml;base64,' + window.btoa(reEncode(svg));
       if (cb) {
         cb(uri);

@@ -251,12 +251,19 @@
     if (navigator.msSaveOrOpenBlob) {
       navigator.msSaveOrOpenBlob(uriToBlob(uri), name);
     } else {
-      var a = document.createElement('a');
-      a.download = name;
-      a.href = uri;
-      document.body.appendChild(a);
-      a.click();
-      a.parentNode.removeChild(a);
+      var saveLink = document.createElement('a');
+      var downloadSupported = 'download' in saveLink;
+      if (downloadSupported) {
+        saveLink.download = name;
+        saveLink.href = uri;
+        saveLink.style.display = 'none';
+        document.body.appendChild(saveLink);
+        saveLink.click();
+        document.body.removeChild(saveLink);
+      }
+      else {
+        window.open(uri, '_temp', 'menubar=no,toolbar=no,status=no');
+      }
     }
   }
 

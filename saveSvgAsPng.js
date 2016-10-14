@@ -66,7 +66,7 @@
     }
   }
 
-  function styles(el, selectorRemap) {
+  function styles(el, selectorRemap, modifyStyle) {
     var css = "";
     var sheets = document.styleSheets;
     for (var i = 0; i < sheets.length; i++) {
@@ -99,7 +99,8 @@
 
             if (match) {
               var selector = selectorRemap ? selectorRemap(rule.selectorText) : rule.selectorText;
-              css += selector + " { " + rule.style.cssText + " }\n";
+              var cssText = modifyStyle ? modifyStyle(rule.style.cssText) : rule.style.cssText;
+              css += selector + " { " + cssText + " }\n";
             } else if(rule.cssText.match(/^@font-face/)) {
               css += rule.cssText + '\n';
             }
@@ -187,7 +188,7 @@
         }
       }
 
-      var css = styles(el, options.selectorRemap);
+      var css = styles(el, options.selectorRemap, options.modifyStyle);
       var s = document.createElement('style');
       s.setAttribute('type', 'text/css');
       s.innerHTML = "<![CDATA[\n" + css + "\n]]>";

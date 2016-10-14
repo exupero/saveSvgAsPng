@@ -78,10 +78,10 @@
       }
 
       if (rules != null) {
-        for (var j = 0; j < rules.length; j++) {
+        for (var j = 0, match; j < rules.length; j++, match = null) {
           var rule = rules[j];
           if (typeof(rule.style) != "undefined") {
-            var match, selectorText;
+            var selectorText;
 
             try {
               selectorText = rule.selectorText;

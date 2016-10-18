@@ -138,6 +138,7 @@
     var xmlns = "http://www.w3.org/2000/xmlns/";
 
     inlineImages(el, function() {
+      var outer = document.createElement("div");
       var clone = el.cloneNode(true);
       var width, height;
       if(el.tagName == 'svg') {
@@ -188,6 +189,8 @@
         }
       }
 
+      outer.appendChild(clone);
+
       var css = styles(el, options.selectorRemap, options.modifyStyle);
       var s = document.createElement('style');
       s.setAttribute('type', 'text/css');
@@ -196,7 +199,7 @@
       defs.appendChild(s);
       clone.insertBefore(defs, clone.firstChild);
 
-      var svg = doctype + new XMLSerializer().serializeToString(clone);
+      var svg = doctype + outer.innerHTML;
       var uri = 'data:image/svg+xml;base64,' + window.btoa(reEncode(svg));
       if (cb) {
         cb(uri);

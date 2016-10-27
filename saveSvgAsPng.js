@@ -269,7 +269,7 @@
       }
     }
   }
-  $out.download = download;
+  out$.download = download;
 
   function uriToBlob(uri) {
     var byteString = window.atob(uri.split(',')[1]);

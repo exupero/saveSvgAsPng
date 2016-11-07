@@ -9,6 +9,9 @@ test('Is loadable using requirejs', function (assert) {
 			'svgAsDataUri': 'function',
 			'svgAsPngUri': 'function',
 			'saveSvgAsPng': 'function',
+			'download': 'function',
+			'prepareSvg': 'function',
+			'saveSvg': 'function',
 		};
 
 		for (var property in saveSvgAsPng) {

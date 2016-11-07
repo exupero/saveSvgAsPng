@@ -129,7 +129,7 @@
     return decodeURIComponent(data);
   }
 
-  out$.svgAsDataUri = function(el, options, cb) {
+  out$.prepareSvg = function(el, options, cb) {
     requireDomNode(el);
 
     options = options || {};
@@ -199,8 +199,15 @@
       defs.appendChild(s);
       clone.insertBefore(defs, clone.firstChild);
 
-      var svg = doctype + outer.innerHTML;
-      var uri = 'data:image/svg+xml;base64,' + window.btoa(reEncode(svg));
+      if (cb) {
+        cb(outer.innerHTML, width, height);
+      }
+    });
+  }
+
+  out$.svgAsDataUri = function(el, options, cb) {
+    out$.prepareSvg(el, options, function(svg) {
+      var uri = 'data:image/svg+xml;base64,' + window.btoa(reEncode(doctype + svg));
       if (cb) {
         cb(uri);
       }
@@ -214,43 +221,62 @@
     options.encoderType = options.encoderType || 'image/png';
     options.encoderOptions = options.encoderOptions || 0.8;
 
-    out$.svgAsDataUri(el, options, function(uri) {
-      var image = new Image();
-      image.onload = function() {
-        var canvas = document.createElement('canvas');
-        canvas.width = image.width;
-        canvas.height = image.height;
-        var context = canvas.getContext('2d');
-        if(options && options.backgroundColor){
-          context.fillStyle = options.backgroundColor;
-          context.fillRect(0, 0, canvas.width, canvas.height);
-        }
-        context.drawImage(image, 0, 0);
-        var a = document.createElement('a'), png;
-        try {
-          png = canvas.toDataURL(options.encoderType, options.encoderOptions);
-        } catch (e) {
-          if ((typeof SecurityError !== 'undefined' && e instanceof SecurityError) || e.name == "SecurityError") {
-            console.error("Rendered SVG images cannot be downloaded in this browser.");
-            return;
-          } else {
-            throw e;
-          }
-        }
-        cb(png);
+    var convertToPng = function(src, w, h) {
+      var canvas = document.createElement('canvas');
+      var context = canvas.getContext('2d');
+      canvas.width = w;
+      canvas.height = h;
+
+      if(options.canvg) {
+        options.canvg(canvas, src);
+      } else {
+        context.drawImage(src, 0, 0);
       }
-      image.onerror = function() {
-        console.error(
-          'There was an error loading the data URI as an image on the following SVG\n',
-          window.atob(uri.slice(26)), '\n',
-          "Open the following link to see browser's diagnosis\n",
-          uri);
+
+      if(options.backgroundColor){
+        context.globalCompositeOperation = 'destination-over';
+        context.fillStyle = options.backgroundColor;
+        context.fillRect(0, 0, canvas.width, canvas.height);
       }
-      image.src = uri;
-    });
+
+      var png;
+      try {
+        png = canvas.toDataURL(options.encoderType, options.encoderOptions);
+      } catch (e) {
+        if ((typeof SecurityError !== 'undefined' && e instanceof SecurityError) || e.name == "SecurityError") {
+          console.error("Rendered SVG images cannot be downloaded in this browser.");
+          return;
+        } else {
+          throw e;
+        }
+      }
+      cb(png);
+    }
+
+    if(options.canvg) {
+      out$.prepareSvg(el, options, convertToPng);
+    } else {
+      out$.svgAsDataUri(el, options, function(uri) {
+        var image = new Image();
+
+        image.onload = function() {
+          convertToPng(image, image.width, image.height);
+        }
+
+        image.onerror = function() {
+          console.error(
+            'There was an error loading the data URI as an image on the following SVG\n',
+            window.atob(uri.slice(26)), '\n',
+            "Open the following link to see browser's diagnosis\n",
+            uri);
+        }
+
+        image.src = uri;
+      });
+    }
   }
 
-  function download(name, uri) {
+  out$.download = function(name, uri) {
     if (navigator.msSaveOrOpenBlob) {
       navigator.msSaveOrOpenBlob(uriToBlob(uri), name);
     } else {
@@ -269,7 +295,6 @@
       }
     }
   }
-  out$.download = download;
 
   function uriToBlob(uri) {
     var byteString = window.atob(uri.split(',')[1]);
@@ -287,7 +312,7 @@
 
     options = options || {};
     out$.svgAsDataUri(el, options, function(uri) {
-      download(name, uri);
+      out$.download(name, uri);
     });
   }
 
@@ -296,7 +321,7 @@
 
     options = options || {};
     out$.svgAsPngUri(el, options, function(uri) {
-      download(name, uri);
+      out$.download(name, uri);
     });
   }
 

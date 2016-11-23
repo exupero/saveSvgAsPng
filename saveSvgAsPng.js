@@ -200,7 +200,9 @@
       clone.insertBefore(defs, clone.firstChild);
 
       if (cb) {
-        cb(outer.innerHTML, width, height);
+        var outHtml = outer.innerHTML;
+        outHtml = outHtml.replace(/NS\d+:href/gi, 'xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href');
+        cb(outHtml, width, height);
       }
     });
   }

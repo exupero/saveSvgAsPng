@@ -2,7 +2,7 @@
 <meta http-equiv="content-type" content="text/html; charset=UTF8">
 <title>saveSvgAsPng</title>
 
-<link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,400,300,600' rel='stylesheet' type='text/css' />
+<link href='https://fonts.googleapis.com/css?family=Open+Sans:400italic,400,300,600' rel='stylesheet' type='text/css' />
 <link rel=stylesheet href=bootstrap.min.css />
 <style>
   @font-face {
@@ -96,6 +96,9 @@
 </script>
 
 <div class=container>
+
+  <!-- Needed to trigger correct custom font rasterization in Chrome -->
+  <span style='font-family: "Stalemate";color:white'>A</span>
   <h1>saveSvgAsPng</h1>
   <p>This page tests various features of saveSvgAsPng.</p>
   <p>You can test your own SVG code in the Sandbox. If something doesn't work as expected, you can <a href="https://github.com/exupero/saveSvgAsPng/issues">file an issue on GitHub</a>.</p>
@@ -267,15 +270,33 @@
     </li>
 
     <li id=custom-font>
-      <div style="color:red">Custom fonts are not currently supported.</div>
       <svg width=200 height=200>
         <text x=100 y=100 text-anchor=middle dy=14 style="font-family:'Stalemate';font-size:36pt;">Custom Fonts</text>
       </svg>
+      <div style="color:red;">
+        <p>
+        Custom fonts are supported but in a very rudimentary way. Note: if you don't see the demo working,
+        just try clicking on the "Save as PNG" button - it should work.
+        </p>
+        <p>
+        <ul>
+          <li>
+            Make sure that the custom font is applied to a non-svg element first. This will help browser to rasterize SVG correctly onto canvas.
+          </li>
+          <li>
+            @font-face declartion has to be inside document stylesheets (not in the external `link` tag)
+          </li>
+          <li>
+            Only first `url()` is inlined into svg (don't have multiple urls in the font-face).
+          </li>
+        </ul>
+        </p>
+      </div>
     </li>
   </ul>
 </div>
 
-<script src=http://code.jquery.com/jquery-latest.js></script>
+<script src=https://code.jquery.com/jquery-latest.js></script>
 <script src=saveSvgAsPng.js></script>
 <script>
   function handleFileSelect(evt) {

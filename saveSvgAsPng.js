@@ -187,8 +187,8 @@
         oReq.addEventListener('load', fontLoaded);
         oReq.addEventListener('error', transferFailed);
         oReq.addEventListener('abort', transferFailed);
-        oReq.responseType = 'arraybuffer';
         oReq.open('GET', font.url);
+        oReq.responseType = 'arraybuffer';
         oReq.send();
 
         function fontLoaded() {

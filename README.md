@@ -67,4 +67,6 @@ npm test
 
 ## Support
 
+[Chrome limits data URIs to 2MB](http://stackoverflow.com/questions/695151/data-protocol-url-size-limitations/41755526#41755526), so you may have trouble generating PNGs beyod a certain size.
+
 Internet Explorer will only work if [canvg](https://github.com/canvg/canvg) is passed in, otherwise it will throw a `SecurityError` when calling `toDataURL` on a canvas that's been written to. [canvg](https://github.com/canvg/canvg) may have it's own issues with SVG support, so ensure you test the output after switching.

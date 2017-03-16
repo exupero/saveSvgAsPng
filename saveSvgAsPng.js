@@ -96,7 +96,7 @@
 
             try {
               if (selectorText) {
-                match = el.querySelector(selectorText);
+                match = el.querySelector(selectorText) || el.parentNode.querySelector(selectorText);
               }
             } catch(err) {
               console.warn('Invalid CSS selector "' + selectorText + '"', err);

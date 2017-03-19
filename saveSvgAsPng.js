@@ -127,6 +127,14 @@
 
               if (externalFontUrl) {
                 // okay, we are lucky. We can fetch this font later
+
+                //handle url if relative
+                if (externalFontUrl.startsWith('../')) {
+                  externalFontUrl = sheets[i].href + '/../' + externalFontUrl
+                } else if (externalFontUrl.startsWith('./')) {
+                  externalFontUrl = sheets[i].href + '/.' + externalFontUrl
+                }
+
                 fontsQueue.push({
                   text: rule.cssText,
                   // Pass url regex, so that once font is downladed, we can run `replace()` on it

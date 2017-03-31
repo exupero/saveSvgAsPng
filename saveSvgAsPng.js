@@ -423,17 +423,21 @@
       var downloadSupported = 'download' in saveLink;
       if (downloadSupported) {
         saveLink.download = name;
-        saveLink.href = uri;
         saveLink.style.display = 'none';
         document.body.appendChild(saveLink);
-        var blob = uriToBlob(uri);
-        var url = URL.createObjectURL(blob);
-        saveLink.href = url;
-        saveLink.onclick = function() {
-          requestAnimationFrame(function() {
-            URL.revokeObjectURL(url);
-          })
-        };
+        try {
+          var blob = uriToBlob(uri);
+          var url = URL.createObjectURL(blob);
+          saveLink.href = url;
+          saveLink.onclick = function() {
+            requestAnimationFrame(function() {
+              URL.revokeObjectURL(url);
+            })
+          };
+        } catch (e) {
+          console.warn('This browser does not support object URLs. Falling back to string URL.');
+          saveLink.href = uri;
+        }
         saveLink.click();
         document.body.removeChild(saveLink);
       }

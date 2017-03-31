@@ -426,6 +426,14 @@
         saveLink.href = uri;
         saveLink.style.display = 'none';
         document.body.appendChild(saveLink);
+        var blob = uriToBlob(uri);
+        var url = URL.createObjectURL(blob);
+        saveLink.href = url;
+        saveLink.onclick = function() {
+          requestAnimationFrame(function() {
+            URL.revokeObjectURL(url);
+          })
+        };
         saveLink.click();
         document.body.removeChild(saveLink);
       }

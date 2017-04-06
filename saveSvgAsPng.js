@@ -125,6 +125,11 @@
                 externalFontUrl = '';
               }
 
+              if (externalFontUrl === 'about:blank') {
+                // no point trying to load this
+                externalFontUrl = '';
+              }
+
               if (externalFontUrl) {
                 // okay, we are lucky. We can fetch this font later
 

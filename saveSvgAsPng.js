@@ -371,6 +371,15 @@
       canvas.width = w;
       canvas.height = h;
 
+      var pixelRatio = window.devicePixelRatio || 1;
+
+      canvas.style.width = canvas.width +'px';
+      canvas.style.height = canvas.height +'px';
+      canvas.width *= pixelRatio;
+      canvas.height *= pixelRatio;
+
+      context.setTransform(pixelRatio,0,0,pixelRatio,0,0);
+      
       if(options.canvg) {
         options.canvg(canvas, src);
       } else {

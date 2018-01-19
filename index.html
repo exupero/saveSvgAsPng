@@ -269,28 +269,24 @@
       </svg>
     </li>
 
+    <li id=transformed-text>
+      <svg width=200 height=200>
+        <text transform="translate(100,100)rotate(45)">Hello</text>
+      </svg>
+    </li>
+
     <li id=custom-font>
       <svg width=200 height=200>
         <text x=100 y=100 text-anchor=middle dy=14 style="font-family:'Stalemate';font-size:36pt;">Custom Fonts</text>
       </svg>
       <div style="color:red;">
         <p>
-        Custom fonts are supported but in a very rudimentary way. Note: if you don't see the demo working,
-        just try clicking on the "Save as PNG" button - it should work.
+          Custom fonts are supported but in a very rudimentary way. Note: if you don't see the demo working,
+          click "Save as PNG" - it should work.
         </p>
-        <p>
-        <ul>
-          <li>
-            Make sure that the custom font is applied to a non-svg element first. This will help browser to rasterize SVG correctly onto canvas.
-          </li>
-          <li>
-            @font-face declartion has to be inside document stylesheets (not in the external `link` tag)
-          </li>
-          <li>
-            Only first `url()` is inlined into svg (don't have multiple urls in the font-face).
-          </li>
-        </ul>
-        </p>
+        <p>Make sure that the custom font is applied to a non-svg element first. This will help browser to rasterize SVG correctly onto canvas.</p>
+        <p>@font-face declaration has to be inside document stylesheets (not in the external `link` tag)</p>
+        <p>Only first `url()` is inlined into svg (don't have multiple urls in the font-face).</p>
       </div>
     </li>
   </ul>
@@ -368,6 +364,7 @@
   inlineTest('With opacity', $('#opacity'));
   inlineTest('When setting xmlns on foreign object children', $('#xmlns-override'));
   inlineTest('When using HTML entites', $('#entities'));
+  inlineTest('Transformed text', $('#transformed-text'));
   inlineTest('With custom fonts', $('#custom-font'));
 
   var $sandbox = $('#sandbox');

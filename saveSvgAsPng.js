@@ -69,9 +69,14 @@
   function styles(el, options, cssLoadedCallback) {
     var selectorRemap = options.selectorRemap;
     var modifyStyle = options.modifyStyle;
+    var modifyCss = options.modifyCss || function(selector, properties) {
+      var selector = selectorRemap ? selectorRemap(selector) : selector;
+      var cssText = modifyStyle ? modifyStyle(properties) : properties;
+      return selector + " { " + cssText + " }\n";
+    };
     var css = "";
-    // each font that has extranl link is saved into queue, and processed
-    // asynchronously
+
+    // Each font that has an external link is saved into queue, and processed asynchronously.
     var fontsQueue = [];
     var sheets = document.styleSheets;
     for (var i = 0; i < sheets.length; i++) {
@@ -103,9 +108,7 @@
             }
 
             if (match) {
-              var selector = selectorRemap ? selectorRemap(rule.selectorText) : rule.selectorText;
-              var cssText = modifyStyle ? modifyStyle(rule.style.cssText) : rule.style.cssText;
-              css += selector + " { " + cssText + " }\n";
+              css += modifyCss(rule.selectorText, rule.style.cssText);
             } else if(rule.cssText.match(/^@font-face/)) {
               // below we are trying to find matches to external link. E.g.
               // @font-face {
@@ -373,13 +376,13 @@
 
       var pixelRatio = window.devicePixelRatio || 1;
 
-      canvas.style.width = canvas.width +'px';
-      canvas.style.height = canvas.height +'px';
+      canvas.style.width = canvas.width+'px';
+      canvas.style.height = canvas.height+'px';
       canvas.width *= pixelRatio;
       canvas.height *= pixelRatio;
 
       context.setTransform(pixelRatio,0,0,pixelRatio,0,0);
-      
+
       if(options.canvg) {
         options.canvg(canvas, src);
       } else {

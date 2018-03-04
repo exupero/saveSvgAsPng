@@ -63,6 +63,10 @@
     fill: green !important;
   }
 
+  #selectors-prefixed rect.css-styled {
+    fill: green !important;
+  }
+
   /* Invalid selectors */
 
   [ng\:cloak] {
@@ -186,6 +190,20 @@
     </li>
 
     <li id=selectors-prefixed>
+      <svg width=200 height=200>
+        <rect x=0 y=50 width=100 height=100></rect>
+        <rect class=css-styled x=100 y=50 width=100 height=100></rect>
+      </svg>
+    </li>
+
+    <li id=modified-style>
+      <svg width=200 height=200>
+        <rect x=0 y=50 width=100 height=100></rect>
+        <rect class=css-styled x=100 y=50 width=100 height=100></rect>
+      </svg>
+    </li>
+
+    <li id=modified-css>
       <svg width=200 height=200>
         <rect x=0 y=50 width=100 height=100></rect>
         <rect class=css-styled x=100 y=50 width=100 height=100></rect>
@@ -346,6 +364,16 @@
   inlineTest('At a higher resolution', $('#scaling'), {scale: 2});
   inlineTest('When CSS styling selectors are prefixed', $('#selectors-prefixed'), {
     selectorRemap: function(s) {return s.replace('#selectors-prefixed ', '')}
+  });
+  inlineTest('Modifying the style', $('#modified-style'), {
+    modifyStyle: function(s) {return s.replace('green', 'red')}
+  });
+  inlineTest('Modifying the whole CSS rule', $('#modified-css'), {
+    modifyCss: function(selector, properties) {
+      selector = selector.replace('#selectors-prefixed ', '');
+      properties = properties.replace('green', 'blue');
+      return selector + '{' + properties + '}';
+    }
   });
   inlineTest('Exporting a group within an SVG', $('#group'), null, {
     selector: '#sub-group'

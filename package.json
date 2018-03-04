@@ -23,7 +23,7 @@
   },
   "homepage": "https://github.com/exupero/saveSvgAsPng",
   "devDependencies": {
-    "requirejs": "^2.1.22",
-    "tape": "^4.2.2"
+    "requirejs": "^2.3.5",
+    "tape": "^4.9.0"
   }
 }

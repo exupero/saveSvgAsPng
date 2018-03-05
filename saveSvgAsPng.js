@@ -2,7 +2,9 @@
   const out$ = typeof exports != 'undefined' && exports || typeof define != 'undefined' && {} || this;
   if (typeof define !== 'undefined') define(() => out$);
 
+  const xmlns = 'http://www.w3.org/2000/xmlns/';
   const doctype = '<?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd" [<!ENTITY nbsp "&#160;">]>';
+  const urlRegex = /url\(["']?(.+?)["']?\)/;
   const fontFormats = {
     woff2: 'font/woff2',
     woff: 'font/woff',
@@ -17,216 +19,23 @@
   const requireDomNode = el => {
     if (!isElement(el)) throw new Error(`an HTMLElement or SVGElement is required; got ${el}`);
   };
-  const isExternal = url => url && url.lastIndexOf('http',0) == 0 && url.lastIndexOf(window.location.host) == -1;
+  const isExternal = url => url && url.lastIndexOf('http',0) === 0 && url.lastIndexOf(window.location.host) === -1;
 
-  const inlineImages = (el, callback) => {
-    requireDomNode(el);
-
-    const images = el.querySelectorAll('image');
-    let left = images.length;
-    const checkDone = () => left === 0 && callback();
-
-    checkDone();
-    for (let i = 0; i < images.length; i++) {
-      (image => {
-        let href = image.getAttributeNS('http://www.w3.org/1999/xlink', 'href');
-        if (href) {
-          if (isExternal(href.value)) {
-            console.warn(`Cannot render embedded images linking to external hosts: ${href.value}`);
-            return;
-          }
-        }
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        const img = new Image();
-        img.crossOrigin = 'anonymous';
-        href = href || image.getAttribute('href');
-        if (href) {
-          img.src = href;
-          img.onload = () => {
-            canvas.width = img.width;
-            canvas.height = img.height;
-            ctx.drawImage(img, 0, 0);
-            image.setAttributeNS('http://www.w3.org/1999/xlink', 'href', canvas.toDataURL('image/png'));
-            left--;
-            checkDone();
-          };
-          img.onerror = () => {
-            console.log(`Could not load ${href}`);
-            left--;
-            checkDone();
-          };
-        } else {
-          left--;
-          checkDone();
-        }
-      })(images[i]);
-    }
+  const getFontMimeTypeFromUrl = fontUrl => {
+    const formats = Object.keys(fontFormats)
+      .filter(extension => fontUrl.indexOf(`.${extension}`) > 0)
+      .map(extension => fontFormats[extension]);
+    if (formats) return formats[0];
+    console.error(`Unknown font format for ${fontUrl}. Fonts may not be working correctly.`);
+    return 'application/octet-stream';
   };
 
-  const styles = (el, options, cssLoadedCallback) => {
-    const selectorRemap = options.selectorRemap;
-    const modifyStyle = options.modifyStyle;
-    const modifyCss = options.modifyCss || ((selector, properties) => {
-      const sel = selectorRemap ? selectorRemap(selector) : selector;
-      const props = modifyStyle ? modifyStyle(properties) : properties;
-      return `${sel}{${props}}\n`;
-    });
-
-    const getFontMimeTypeFromUrl = fontUrl => {
-      const extensions = Object.keys(fontFormats);
-      for (let i = 0; i < extensions.length; ++i) {
-        const extension = extensions[i];
-        // TODO: This is not bullet proof, it needs to handle edge cases...
-        if (fontUrl.indexOf('.' + extension) > 0) {
-          return fontFormats[extension];
-        }
-      }
-
-      // If you see this error message, you probably need to update code above.
-      console.error('Unknown font format for ' + fontUrl+ '; Fonts may not be working correctly');
-      return 'application/octet-stream';
-    };
-
-    const arrayBufferToBase64 = buffer => {
-      let binary = '';
-      const bytes = new Uint8Array(buffer);
-      const len = bytes.byteLength;
-      for (let i = 0; i < len; i++) {
-          binary += String.fromCharCode(bytes[i]);
-      }
-      return window.btoa(binary);
-    }
-
-    const processFontQueue = queue => {
-      const processNext = font => {
-        const fontLoaded = () => {
-          // TODO: it may be also worth to wait until fonts are fully loaded before
-          // attempting to rasterize them. (e.g. use https://developer.mozilla.org/en-US/docs/Web/API/FontFaceSet )
-          const fontBits = oReq.response;
-          const fontInBase64 = arrayBufferToBase64(fontBits);
-          updateFontStyle(font, fontInBase64);
-        }
-
-        const transferFailed = e => {
-          console.warn('Failed to load font from: ' + font.url);
-          console.warn(e)
-          css += font.text + '\n';
-          processFontQueue(queue);
-        }
-
-        const updateFontStyle = (font, fontInBase64) => {
-          const dataUrl = `url("data:${font.format};base64,${fontInBase64}")`;
-          css += font.text.replace(font.fontUrlRegexp, dataUrl) + '\n';
-          setTimeout(() => processFontQueue(queue), 0);
-        }
-
-        // TODO: This could benefit from caching.
-        const oReq = new XMLHttpRequest();
-        oReq.addEventListener('load', fontLoaded);
-        oReq.addEventListener('error', transferFailed);
-        oReq.addEventListener('abort', transferFailed);
-        oReq.open('GET', font.url);
-        oReq.responseType = 'arraybuffer';
-        oReq.send();
-      }
-
-      if (queue.length > 0) {
-        processNext(queue.pop());
-      } else {
-        cssLoadedCallback(css);
-      }
-    };
-
-    let css = '';
-
-    // Each font that has an external link is saved into queue, and processed asynchronously.
-    const fontsQueue = [];
-    const sheets = document.styleSheets;
-    for (let i = 0; i < sheets.length; i++) {
-      let rules;
-      try {
-        rules = sheets[i].cssRules;
-      } catch (e) {
-        console.warn(`Stylesheet could not be loaded: ${sheets[i].href}`);
-        continue;
-      }
-
-      if (rules != null) {
-        for (let j = 0, match; j < rules.length; j++, match = null) {
-          const rule = rules[j];
-          if (typeof(rule.style) != 'undefined') {
-            let selectorText;
-
-            try {
-              selectorText = rule.selectorText;
-            } catch(err) {
-              console.warn(`The following CSS rule has an invalid selector: "${rule}"`, err);
-            }
-
-            try {
-              if (selectorText) {
-                match = el.querySelector(selectorText) || (el.parentNode && el.parentNode.querySelector(selectorText));
-              }
-            } catch(err) {
-              console.warn(`Invalid CSS selector "${selectorText}"`, err);
-            }
-
-            if (match) {
-              css += modifyCss(rule.selectorText, rule.style.cssText);
-            } else if(rule.cssText.match(/^@font-face/)) {
-              // below we are trying to find matches to external link. E.g.
-              // @font-face {
-              //   // ...
-              //   src: local('Abel'), url(https://fonts.gstatic.com/s/abel/v6/UzN-iejR1VoXU2Oc-7LsbvesZW2xOQ-xsNqO47m55DA.woff2);
-              // }
-              //
-              // This regex will save extrnal link into first capture group
-              const fontUrlRegexp = /url\(["']?(.+?)["']?\)/;
-              // TODO: This needs to be changed to support multiple url declarations per font.
-              const fontUrlMatch = rule.cssText.match(fontUrlRegexp);
-
-              let externalFontUrl = (fontUrlMatch && fontUrlMatch[1]) || '';
-              const fontUrlIsDataURI = externalFontUrl.match(/^data:/);
-              if (fontUrlIsDataURI) {
-                // We should ignore data uri - they are already embedded
-                externalFontUrl = '';
-              }
-
-              if (externalFontUrl === 'about:blank') {
-                // no point trying to load this
-                externalFontUrl = '';
-              }
-
-              if (externalFontUrl) {
-                // okay, we are lucky. We can fetch this font later
-
-                //handle url if relative
-                if (externalFontUrl.startsWith('../')) {
-                  externalFontUrl = sheets[i].href + '/../' + externalFontUrl
-                } else if (externalFontUrl.startsWith('./')) {
-                  externalFontUrl = sheets[i].href + '/.' + externalFontUrl
-                }
-
-                fontsQueue.push({
-                  text: rule.cssText,
-                  // Pass url regex, so that once font is downladed, we can run `replace()` on it
-                  fontUrlRegexp: fontUrlRegexp,
-                  format: getFontMimeTypeFromUrl(externalFontUrl),
-                  url: externalFontUrl
-                });
-              } else {
-                // otherwise, use previous logic
-                css += rule.cssText + '\n';
-              }
-            }
-          }
-        }
-      }
-    }
-
-    processFontQueue(fontsQueue);
-  };
+  const arrayBufferToBase64 = buffer => {
+    let binary = '';
+    const bytes = new Uint8Array(buffer);
+    for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
+    return window.btoa(binary);
+  }
 
   const getDimension = (el, clone, dim) => {
     const v =
@@ -236,6 +45,20 @@
       parseInt(clone.style[dim]) ||
       parseInt(window.getComputedStyle(el).getPropertyValue(dim));
     return typeof v === 'undefined' || v === null || isNaN(parseFloat(v)) ? 0 : v;
+  };
+
+  const getDimensions = (el, clone, width, height) => {
+    if (el.tagName === 'svg') return {
+      width: width || getDimension(el, clone, 'width'),
+      height: height || getDimension(el, clone, 'height')
+    };
+    else if (el.getBBox) {
+      const {x, y, width, height} = el.getBBox();
+      return {
+        width: x + width,
+        height: y + height
+      };
+    }
   };
 
   const reEncode = data =>
@@ -258,161 +81,249 @@
     return new Blob([buffer], {type: mimeString});
   };
 
-  out$.prepareSvg = (el, options, cb) => {
+  const sheetRules = sheet => {
+    try {
+      return sheet.cssRules;
+    } catch (e) {
+      console.warn(`Stylesheet could not be loaded: ${sheet.href}`);
+    }
+  };
+
+  const query = (el, selector) => {
+    if (!selector) return;
+    try {
+      return el.querySelector(selector) || el.parentNode && el.parentNode.querySelector(selector);
+    } catch(err) {
+      console.warn(`Invalid CSS selector "${selector}"`, err);
+    }
+  };
+
+  const fontRule = rule => {
+    // Match CSS font-face rules to external links.
+    // @font-face {
+    //   src: local('Abel'), url(https://fonts.gstatic.com/s/abel/v6/UzN-iejR1VoXU2Oc-7LsbvesZW2xOQ-xsNqO47m55DA.woff2);
+    // }
+    const match = rule.cssText.match(urlRegex);
+    const url = (match && match[1]) || '';
+    if (!url || url.match(/^data:/) || url === 'about:blank') return;
+    const fullUrl =
+      url.startsWith('../') ? `${rule.href}/../${url}`
+      : url.startsWith('./') ? `${rule.href}/.${url}`
+      : url;
+    return {
+      text: rule.cssText,
+      format: getFontMimeTypeFromUrl(fullUrl),
+      url: fullUrl
+    };
+  };
+
+  const inlineImages = el => Promise.all(
+    Array.from(el.querySelectorAll('image')).map(image => {
+      const href = image.getAttributeNS('http://www.w3.org/1999/xlink', 'href') || image.getAttribute('href');
+      if (!href) return Promise.resolve(null);
+      if (isExternal(href.value)) {
+        console.warn(`Cannot render embedded images linking to external hosts: ${href.value}`);
+        return Promise.resolve(null);
+      }
+      return new Promise((resolve, reject) => {
+        const canvas = document.createElement('canvas');
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.src = href;
+        img.onerror = () => reject(new Error(`Could not load ${href}`));
+        img.onload = () => {
+          canvas.width = img.width;
+          canvas.height = img.height;
+          canvas.getContext('2d').drawImage(img, 0, 0);
+          image.setAttributeNS('http://www.w3.org/1999/xlink', 'href', canvas.toDataURL('image/png'));
+          resolve(true);
+        };
+      });
+    })
+  );
+
+  const inlineFonts = fonts => Promise.all(
+    fonts.map(font =>
+      new Promise((resolve, reject) => {
+        const req = new XMLHttpRequest();
+        req.addEventListener('load', () => {
+          // TODO: it may be also worth to wait until fonts are fully loaded before
+          // attempting to rasterize them. (e.g. use https://developer.mozilla.org/en-US/docs/Web/API/FontFaceSet)
+          const fontBits = req.response;
+          const fontInBase64 = arrayBufferToBase64(fontBits);
+          resolve(font.text.replace(urlRegex, `url("data:${font.format};base64,${fontInBase64}")`)+'\n');
+        });
+        req.addEventListener('error', e => {
+          console.warn('Failed to load font from: ${font.url}', e);
+          resolve(null);
+        });
+        req.addEventListener('abort', e => {
+          console.warn('Aboarded loading font from: ${font.url}', e);
+          resolve(null);
+        });
+        req.open('GET', font.url);
+        req.responseType = 'arraybuffer';
+        req.send();
+      })
+    )
+  ).then(fontCss => fontCss.filter(x => x).join(''));
+
+  const inlineCss = (el, options) => {
+    const {
+      selectorRemap,
+      modifyStyle,
+      modifyCss
+    } = options || {};
+    const generateCss = modifyCss || ((selector, properties) => {
+      const sel = selectorRemap ? selectorRemap(selector) : selector;
+      const props = modifyStyle ? modifyStyle(properties) : properties;
+      return `${sel}{${props}}\n`;
+    });
+    const css = [];
+    const fonts = [];
+    Array.from(document.styleSheets).forEach(sheet => {
+      const rules = sheetRules(sheet);
+      if (!rules) return;
+      Array.from(rules).forEach(rule => {
+        if (typeof rule.style != 'undefined') {
+          if (query(el, rule.selectorText)) css.push(generateCss(rule.selectorText, rule.style.cssText));
+          else if (rule.cssText.match(/^@font-face/)) {
+            const font = fontRule(rule);
+            if (font) fonts.push(font);
+          } else css.push(`${rule.cssText}\n`);
+        }
+      });
+    });
+
+    return inlineFonts(fonts).then(fontCss => css.join('\n') + fontCss);
+  };
+
+  out$.prepareSvg = (el, options, done) => {
     requireDomNode(el);
+    const {
+      left = 0,
+      top = 0,
+      width: w,
+      height: h,
+      scale = 1,
+      responsive = false,
+    } = options || {};
 
-    options = options || {};
-    options.scale = options.scale || 1;
-    options.responsive = options.responsive || false;
-    const xmlns = 'http://www.w3.org/2000/xmlns/';
-
-    inlineImages(el, () => {
-      const outer = document.createElement('div');
+    return inlineImages(el).then(() => {
       let clone = el.cloneNode(true);
-      let width, height;
-      if(el.tagName == 'svg') {
-        width = options.width || getDimension(el, clone, 'width');
-        height = options.height || getDimension(el, clone, 'height');
-      } else if(el.getBBox) {
-        const box = el.getBBox();
-        width = box.x + box.width;
-        height = box.y + box.height;
-        clone.setAttribute('transform', clone.getAttribute('transform').replace(/translate\(.*?\)/, ''));
+      const {width, height} = getDimensions(el, clone, w, h);
 
-        const svg = document.createElementNS('http://www.w3.org/2000/svg','svg')
-        svg.appendChild(clone)
-        clone = svg;
-      } else {
-        console.error('Attempted to render non-SVG element', el);
-        return;
+      if (el.tagName !== 'svg') {
+        if (el.getBBox) {
+          clone.setAttribute('transform', clone.getAttribute('transform').replace(/translate\(.*?\)/, ''));
+          const svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+          svg.appendChild(clone);
+          clone = svg;
+        } else {
+          console.error('Attempted to render non-SVG element', el);
+          return;
+        }
       }
 
       clone.setAttribute('version', '1.1');
-      if (!clone.getAttribute('xmlns')) {
-        clone.setAttributeNS(xmlns, 'xmlns', 'http://www.w3.org/2000/svg');
-      }
-      if (!clone.getAttribute('xmlns:xlink')) {
-        clone.setAttributeNS(xmlns, 'xmlns:xlink', 'http://www.w3.org/1999/xlink');
-      }
+      clone.setAttribute('viewBox', [left, top, width, height].join(' '));
+      if (!clone.getAttribute('xmlns')) clone.setAttributeNS(xmlns, 'xmlns', 'http://www.w3.org/2000/svg');
+      if (!clone.getAttribute('xmlns:xlink')) clone.setAttributeNS(xmlns, 'xmlns:xlink', 'http://www.w3.org/1999/xlink');
 
-      if (options.responsive) {
+      if (responsive) {
         clone.removeAttribute('width');
         clone.removeAttribute('height');
         clone.setAttribute('preserveAspectRatio', 'xMinYMin meet');
       } else {
-        clone.setAttribute('width', width * options.scale);
-        clone.setAttribute('height', height * options.scale);
+        clone.setAttribute('width', width * scale);
+        clone.setAttribute('height', height * scale);
       }
 
-      clone.setAttribute('viewBox', [
-        options.left || 0,
-        options.top || 0,
-        width,
-        height
-      ].join(' '));
+      Array.from(clone.querySelectorAll('foreignObject > *')).forEach(foreignObject => {
+        if (!foreignObject.getAttribute('xmlns'))
+          foreignObject.setAttributeNS(xmlns, 'xmlns', 'http://www.w3.org/1999/xhtml');
+      });
 
-      const fos = clone.querySelectorAll('foreignObject > *');
-      for (let i = 0; i < fos.length; i++) {
-        if (!fos[i].getAttribute('xmlns')) {
-          fos[i].setAttributeNS(xmlns, 'xmlns', 'http://www.w3.org/1999/xhtml');
-        }
-      }
+      return inlineCss(el, options).then(css => {
+        const style = document.createElement('style');
+        style.setAttribute('type', 'text/css');
+        style.innerHTML = `<![CDATA[\n${css}\n]]>`;
 
-      outer.appendChild(clone);
-
-      // In case of custom fonts we need to fetch font first, and then inline
-      // its url into data-uri format (encode as base64). That's why style
-      // processing is done asynchonously.
-      styles(el, options, css => {
-        // here all fonts are inlined, so that we can render them properly.
-        const s = document.createElement('style');
-        s.setAttribute('type', 'text/css');
-        s.innerHTML = `<![CDATA[\n${css}\n]]>`;
         const defs = document.createElement('defs');
-        defs.appendChild(s);
+        defs.appendChild(style);
         clone.insertBefore(defs, clone.firstChild);
 
-        if (cb) {
-          let outHtml = outer.innerHTML;
-          outHtml = outHtml.replace(/NS\d+:href/gi, 'xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href');
-          cb(outHtml, width, height);
-        }
+        const outer = document.createElement('div');
+        outer.appendChild(clone);
+        const outHtml = outer.innerHTML.replace(/NS\d+:href/gi, 'xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href');
+
+        if (done) done(outHtml, width, height);
+        else return Promise.resolve({html: outHtml, width, height});
       });
     });
   };
 
-  out$.svgAsDataUri = (el, options, cb) => {
-    out$.prepareSvg(el, options, svg => cb && cb('data:image/svg+xml;base64,' + window.btoa(reEncode(doctype + svg))));
+  out$.svgAsDataUri = (el, options, done) => {
+    requireDomNode(el);
+    const result = out$.prepareSvg(el, options)
+      .then(({html}) => `data:image/svg+xml;base64,${window.btoa(reEncode(doctype+html))}`);
+    if (done) return result.then(done);
+    return result;
   };
 
-  out$.svgAsPngUri = (el, options, cb) => {
+  out$.svgAsPngUri = (el, options, done) => {
     requireDomNode(el);
-
-    options = options || {};
-    options.encoderType = options.encoderType || 'image/png';
-    options.encoderOptions = options.encoderOptions || 0.8;
+    const {
+      encoderType = 'image/png',
+      encoderOptions = 0.8,
+      backgroundColor,
+      canvg
+    } = options || {};
 
     const convertToPng = (src, w, h) => {
       const canvas = document.createElement('canvas');
       const context = canvas.getContext('2d');
-      canvas.width = w;
-      canvas.height = h;
-
       const pixelRatio = window.devicePixelRatio || 1;
 
-      canvas.style.width = canvas.width+'px';
-      canvas.style.height = canvas.height+'px';
-      canvas.width *= pixelRatio;
-      canvas.height *= pixelRatio;
+      canvas.width = w * pixelRatio;
+      canvas.height = h * pixelRatio;
+      canvas.style.width = `${canvas.width}px`;
+      canvas.style.height = `${canvas.height}px`;
+      context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
 
-      context.setTransform(pixelRatio,0,0,pixelRatio,0,0);
+      if (canvg) canvg(canvas, src);
+      else context.drawImage(src, 0, 0);
 
-      if(options.canvg) {
-        options.canvg(canvas, src);
-      } else {
-        context.drawImage(src, 0, 0);
-      }
-
-      if(options.backgroundColor){
+      if (backgroundColor) {
         context.globalCompositeOperation = 'destination-over';
-        context.fillStyle = options.backgroundColor;
+        context.fillStyle = backgroundColor;
         context.fillRect(0, 0, canvas.width, canvas.height);
       }
 
       let png;
       try {
-        png = canvas.toDataURL(options.encoderType, options.encoderOptions);
+        png = canvas.toDataURL(encoderType, encoderOptions);
       } catch (e) {
-        if ((typeof SecurityError !== 'undefined' && e instanceof SecurityError) || e.name == 'SecurityError') {
+        if ((typeof SecurityError !== 'undefined' && e instanceof SecurityError) || e.name === 'SecurityError') {
           console.error('Rendered SVG images cannot be downloaded in this browser.');
           return;
-        } else {
-          throw e;
-        }
+        } else throw e;
       }
-      cb(png);
+      done(png);
     }
 
-    if(options.canvg) {
-      out$.prepareSvg(el, options, convertToPng);
-    } else {
-      out$.svgAsDataUri(el, options, uri => {
-        const image = new Image();
-        image.onload = () => convertToPng(image, image.width, image.height);
-        image.onerror = () => console.error(
-          'There was an error loading the data URI as an image on the following SVG\n',
-          window.atob(uri.slice(26)), '\n',
-          "Open the following link to see browser's diagnosis\n",
-          uri);
-        image.src = uri;
-      });
-    }
+    if (canvg) out$.prepareSvg(el, options, convertToPng);
+    else out$.svgAsDataUri(el, options, uri => {
+      const image = new Image();
+      image.onload = () => convertToPng(image, image.width, image.height);
+      image.onerror = () => console.error(`There was an error loading the data URI as an image on the following SVG\n${window.atob(uri.slice(26))}Open the following link to see browser's diagnosis\n${uri}`);
+      image.src = uri;
+    });
   };
 
   out$.download = (name, uri) => {
-    if (navigator.msSaveOrOpenBlob) {
-      navigator.msSaveOrOpenBlob(uriToBlob(uri), name);
-    } else {
+    if (navigator.msSaveOrOpenBlob) navigator.msSaveOrOpenBlob(uriToBlob(uri), name);
+    else {
       const saveLink = document.createElement('a');
       const downloadSupported = 'download' in saveLink;
       if (downloadSupported) {

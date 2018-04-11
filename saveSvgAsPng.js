@@ -32,17 +32,14 @@
     for (var i = 0; i < images.length; i++) {
       (function(image) {
         var href = image.getAttributeNS("http://www.w3.org/1999/xlink", "href");
-        if (href) {
-          if (isExternal(href.value)) {
-            console.warn("Cannot render embedded images linking to external hosts: "+href.value);
-            return;
-          }
-        }
         var canvas = document.createElement('canvas');
         var ctx = canvas.getContext('2d');
         var img = new Image();
         img.crossOrigin="anonymous";
         href = href || image.getAttribute('href');
+        if (isExternal(href)) {
+          href += (href.indexOf('?') === -1 ? '?' : '&') + 't=' + (new Date().valueOf());
+        }
         if (href) {
           img.src = href;
           img.onload = function() {

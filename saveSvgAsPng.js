@@ -119,11 +119,10 @@
 
   const inlineImages = el => Promise.all(
     Array.from(el.querySelectorAll('image')).map(image => {
-      const href = image.getAttributeNS('http://www.w3.org/1999/xlink', 'href') || image.getAttribute('href');
+      let href = image.getAttributeNS('http://www.w3.org/1999/xlink', 'href') || image.getAttribute('href');
       if (!href) return Promise.resolve(null);
-      if (isExternal(href.value)) {
-        console.warn(`Cannot render embedded images linking to external hosts: ${href.value}`);
-        return Promise.resolve(null);
+      if (isExternal(href)) {
+        href += (href.indexOf('?') === -1 ? '?' : '&') + 't=' + new Date().valueOf();
       }
       return new Promise((resolve, reject) => {
         const canvas = document.createElement('canvas');
@@ -325,8 +324,7 @@
     if (navigator.msSaveOrOpenBlob) navigator.msSaveOrOpenBlob(uriToBlob(uri), name);
     else {
       const saveLink = document.createElement('a');
-      const downloadSupported = 'download' in saveLink;
-      if (downloadSupported) {
+      if ('download' in saveLink) {
         saveLink.download = name;
         saveLink.style.display = 'none';
         document.body.appendChild(saveLink);

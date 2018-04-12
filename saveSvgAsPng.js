@@ -31,11 +31,11 @@
     checkDone();
     for (var i = 0; i < images.length; i++) {
       (function(image) {
-        var href = image.getAttributeNS("http://www.w3.org/1999/xlink", "href");
         var canvas = document.createElement('canvas');
         var ctx = canvas.getContext('2d');
         var img = new Image();
         img.crossOrigin="anonymous";
+        var href = image.getAttributeNS("http://www.w3.org/1999/xlink", "href");
         href = href || image.getAttribute('href');
         if (isExternal(href)) {
           href += (href.indexOf('?') === -1 ? '?' : '&') + 't=' + (new Date().valueOf());
@@ -434,8 +434,7 @@
       navigator.msSaveOrOpenBlob(uriToBlob(uri), name);
     } else {
       var saveLink = document.createElement('a');
-      var downloadSupported = 'download' in saveLink;
-      if (downloadSupported) {
+      if ('download' in saveLink) {
         saveLink.download = name;
         saveLink.style.display = 'none';
         document.body.appendChild(saveLink);

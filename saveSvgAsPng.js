@@ -98,7 +98,7 @@
     }
   };
 
-  const fontRule = rule => {
+  const detectCssFont = rule => {
     // Match CSS font-face rules to external links.
     // @font-face {
     //   src: local('Abel'), url(https://fonts.gstatic.com/s/abel/v6/UzN-iejR1VoXU2Oc-7LsbvesZW2xOQ-xsNqO47m55DA.woff2);
@@ -146,18 +146,18 @@
       new Promise((resolve, reject) => {
         const req = new XMLHttpRequest();
         req.addEventListener('load', () => {
-          // TODO: it may be also worth to wait until fonts are fully loaded before
+          // TODO: it may also be worth it to wait until fonts are fully loaded before
           // attempting to rasterize them. (e.g. use https://developer.mozilla.org/en-US/docs/Web/API/FontFaceSet)
           const fontBits = req.response;
           const fontInBase64 = arrayBufferToBase64(fontBits);
           resolve(font.text.replace(urlRegex, `url("data:${font.format};base64,${fontInBase64}")`)+'\n');
         });
         req.addEventListener('error', e => {
-          console.warn('Failed to load font from: ${font.url}', e);
+          console.warn(`Failed to load font from: ${font.url}`, e);
           resolve(null);
         });
         req.addEventListener('abort', e => {
-          console.warn('Aboarded loading font from: ${font.url}', e);
+          console.warn(`Aborted loading font from: ${font.url}`, e);
           resolve(null);
         });
         req.open('GET', font.url);
@@ -171,7 +171,8 @@
     const {
       selectorRemap,
       modifyStyle,
-      modifyCss
+      modifyCss,
+      fonts
     } = options || {};
     const generateCss = modifyCss || ((selector, properties) => {
       const sel = selectorRemap ? selectorRemap(selector) : selector;
@@ -179,22 +180,23 @@
       return `${sel}{${props}}\n`;
     });
     const css = [];
-    const fonts = [];
+    const detectFonts = typeof fonts === 'undefined';
+    const fontList = fonts || [];
     Array.from(document.styleSheets).forEach(sheet => {
       const rules = sheetRules(sheet);
       if (!rules) return;
       Array.from(rules).forEach(rule => {
         if (typeof rule.style != 'undefined') {
           if (query(el, rule.selectorText)) css.push(generateCss(rule.selectorText, rule.style.cssText));
-          else if (rule.cssText.match(/^@font-face/)) {
-            const font = fontRule(rule);
-            if (font) fonts.push(font);
-          } else css.push(`${rule.cssText}\n`);
+          else if (detectFonts && rule.cssText.match(/^@font-face/)) {
+            const font = detectCssFont(rule);
+            if (font) fontList.push(font);
+          } else css.push(rule.cssText);
         }
       });
     });
 
-    return inlineFonts(fonts).then(fontCss => css.join('\n') + fontCss);
+    return inlineFonts(fontList).then(fontCss => css.join('\n') + fontCss);
   };
 
   out$.prepareSvg = (el, options, done) => {

@@ -1,6 +1,6 @@
 {
   "name": "save-svg-as-png",
-  "version": "1.3.2",
+  "version": "1.4.0",
   "description": "Convert a browser SVG to PNG or dataUri",
   "main": "saveSvgAsPng.js",
   "scripts": {
@@ -23,7 +23,7 @@
   },
   "homepage": "https://github.com/exupero/saveSvgAsPng",
   "devDependencies": {
-    "requirejs": "^2.1.22",
-    "tape": "^4.2.2"
+    "requirejs": "^2.3.5",
+    "tape": "^4.9.0"
   }
 }

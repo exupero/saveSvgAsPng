@@ -81,14 +81,6 @@
     return new Blob([buffer], {type: mimeString});
   };
 
-  const sheetRules = sheet => {
-    try {
-      return sheet.cssRules;
-    } catch (e) {
-      console.warn(`Stylesheet could not be loaded: ${sheet.href}`);
-    }
-  };
-
   const query = (el, selector) => {
     if (!selector) return;
     try {
@@ -141,19 +133,24 @@
     })
   );
 
+  const cachedFonts = {};
   const inlineFonts = fonts => Promise.all(
     fonts.map(font =>
       new Promise((resolve, reject) => {
+        if (cachedFonts[font.url]) return resolve(cachedFonts[font.url]);
+
         const req = new XMLHttpRequest();
         req.addEventListener('load', () => {
           // TODO: it may also be worth it to wait until fonts are fully loaded before
           // attempting to rasterize them. (e.g. use https://developer.mozilla.org/en-US/docs/Web/API/FontFaceSet)
-          const fontBits = req.response;
-          const fontInBase64 = arrayBufferToBase64(fontBits);
-          resolve(font.text.replace(urlRegex, `url("data:${font.format};base64,${fontInBase64}")`)+'\n');
+          const fontInBase64 = arrayBufferToBase64(req.response);
+          const fontUri = font.text.replace(urlRegex, `url("data:${font.format};base64,${fontInBase64}")`)+'\n';
+          cachedFonts[font.url] = fontUri;
+          resolve(fontUri);
         });
         req.addEventListener('error', e => {
           console.warn(`Failed to load font from: ${font.url}`, e);
+          cachedFonts[font.url] = null;
           resolve(null);
         });
         req.addEventListener('abort', e => {
@@ -166,6 +163,18 @@
       })
     )
   ).then(fontCss => fontCss.filter(x => x).join(''));
+
+  let cachedRules = null;
+  const styleSheetRules = () => {
+    if (cachedRules) return cachedRules;
+    return cachedRules = Array.from(document.styleSheets).map(sheet => {
+      try {
+        return sheet.cssRules;
+      } catch (e) {
+        console.warn(`Stylesheet could not be loaded: ${sheet.href}`);
+      }
+    });
+  };
 
   const inlineCss = (el, options) => {
     const {
@@ -182,8 +191,7 @@
     const css = [];
     const detectFonts = typeof fonts === 'undefined';
     const fontList = fonts || [];
-    Array.from(document.styleSheets).forEach(sheet => {
-      const rules = sheetRules(sheet);
+    styleSheetRules().forEach(rules => {
       if (!rules) return;
       Array.from(rules).forEach(rule => {
         if (typeof rule.style != 'undefined') {

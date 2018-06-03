@@ -27,7 +27,8 @@ function inlineTest(title, $el, saveOptions, testOptions) {
   row.find('.canvas').html(svg);
 
   const canvas = row.find(testOptions && testOptions.selector || 'svg')[0];
-  svgAsPngUri(canvas, saveOptions, uri => row.find('.preview').html('<img src="' + uri + '" />'));
+  svgAsPngUri(canvas, saveOptions)
+    .then(uri => row.find('.preview').html('<img src="' + uri + '" />'));
 
   row.find('.save').click(() => saveSvgAsPng(canvas, 'test.png', saveOptions));
 }

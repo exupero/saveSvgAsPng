@@ -264,10 +264,10 @@
 
         const outer = document.createElement('div');
         outer.appendChild(clone);
-        const outHtml = outer.innerHTML.replace(/NS\d+:href/gi, 'xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href');
+        const src = outer.innerHTML.replace(/NS\d+:href/gi, 'xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href');
 
-        if (done) done(outHtml, width, height);
-        else return Promise.resolve({html: outHtml, width, height});
+        if (typeof done === 'function') done(src, width, height);
+        else return {src, width, height};
       });
     });
   };
@@ -275,8 +275,8 @@
   out$.svgAsDataUri = (el, options, done) => {
     requireDomNode(el);
     const result = out$.prepareSvg(el, options)
-      .then(({html}) => `data:image/svg+xml;base64,${window.btoa(reEncode(doctype+html))}`);
-    if (done) return result.then(done);
+      .then(({src}) => `data:image/svg+xml;base64,${window.btoa(reEncode(doctype+src))}`);
+    if (typeof done === 'function') return result.then(done);
     return result;
   };
 
@@ -289,13 +289,13 @@
       canvg
     } = options || {};
 
-    const convertToPng = (src, w, h) => {
+    const convertToPng = ({src, width, height}) => {
       const canvas = document.createElement('canvas');
       const context = canvas.getContext('2d');
       const pixelRatio = window.devicePixelRatio || 1;
 
-      canvas.width = w * pixelRatio;
-      canvas.height = h * pixelRatio;
+      canvas.width = width * pixelRatio;
+      canvas.height = height * pixelRatio;
       canvas.style.width = `${canvas.width}px`;
       canvas.style.height = `${canvas.height}px`;
       context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
@@ -318,15 +318,24 @@
           return;
         } else throw e;
       }
-      done(png);
+      if (typeof done === 'function') done(png);
+      return Promise.resolve(png);
     }
 
-    if (canvg) out$.prepareSvg(el, options, convertToPng);
-    else out$.svgAsDataUri(el, options, uri => {
-      const image = new Image();
-      image.onload = () => convertToPng(image, image.width, image.height);
-      image.onerror = () => console.error(`There was an error loading the data URI as an image on the following SVG\n${window.atob(uri.slice(26))}Open the following link to see browser's diagnosis\n${uri}`);
-      image.src = uri;
+    if (canvg) return out$.prepareSvg(el, options).then(convertToPng);
+    else return out$.svgAsDataUri(el, options).then(uri => {
+      return new Promise((resolve, reject) => {
+        const image = new Image();
+        image.onload = () => resolve(convertToPng({
+          src: image,
+          width: image.width,
+          height: image.height
+        }));
+        image.onerror = () => {
+          reject(`There was an error loading the data URI as an image on the following SVG\n${window.atob(uri.slice(26))}Open the following link to see browser's diagnosis\n${uri}`);
+        }
+        image.src = uri;
+      })
     });
   };
 

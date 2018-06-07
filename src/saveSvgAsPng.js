@@ -90,7 +90,7 @@
     }
   };
 
-  const detectCssFont = rule => {
+  const detectCssFont = (rule, href) => {
     // Match CSS font-face rules to external links.
     // @font-face {
     //   src: local('Abel'), url(https://fonts.gstatic.com/s/abel/v6/UzN-iejR1VoXU2Oc-7LsbvesZW2xOQ-xsNqO47m55DA.woff2);
@@ -99,8 +99,8 @@
     const url = (match && match[1]) || '';
     if (!url || url.match(/^data:/) || url === 'about:blank') return;
     const fullUrl =
-      url.startsWith('../') ? `${rule.href}/../${url}`
-      : url.startsWith('./') ? `${rule.href}/.${url}`
+      url.startsWith('../') ? `${href}/../${url}`
+      : url.startsWith('./') ? `${href}/.${url}`
       : url;
     return {
       text: rule.cssText,
@@ -169,9 +169,10 @@
     if (cachedRules) return cachedRules;
     return cachedRules = Array.from(document.styleSheets).map(sheet => {
       try {
-        return sheet.cssRules;
+        return {rules: sheet.cssRules, href: sheet.href};
       } catch (e) {
-        console.warn(`Stylesheet could not be loaded: ${sheet.href}`);
+        console.warn(`Stylesheet could not be loaded: ${sheet.href}`, e);
+        return {};
       }
     });
   };
@@ -191,13 +192,13 @@
     const css = [];
     const detectFonts = typeof fonts === 'undefined';
     const fontList = fonts || [];
-    styleSheetRules().forEach(rules => {
+    styleSheetRules().forEach(({rules, href}) => {
       if (!rules) return;
       Array.from(rules).forEach(rule => {
         if (typeof rule.style != 'undefined') {
           if (query(el, rule.selectorText)) css.push(generateCss(rule.selectorText, rule.style.cssText));
           else if (detectFonts && rule.cssText.match(/^@font-face/)) {
-            const font = detectCssFont(rule);
+            const font = detectCssFont(rule, href);
             if (font) fontList.push(font);
           } else css.push(rule.cssText);
         }

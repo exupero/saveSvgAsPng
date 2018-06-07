@@ -1,5 +1,5 @@
 (function() {
-  const out$ = typeof exports != 'undefined' && exports || typeof define != 'undefined' && {} || this;
+  const out$ = typeof exports != 'undefined' && exports || typeof define != 'undefined' && {} || this || window;
   if (typeof define !== 'undefined') define(() => out$);
 
   const xmlns = 'http://www.w3.org/2000/xmlns/';

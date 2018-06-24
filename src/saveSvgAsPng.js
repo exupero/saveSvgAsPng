@@ -1,6 +1,6 @@
 (function() {
   const out$ = typeof exports != 'undefined' && exports || typeof define != 'undefined' && {} || this || window;
-  if (typeof define !== 'undefined') define(() => out$);
+  if (typeof define !== 'undefined') define('save-svg-as-png', [], () => out$);
 
   const xmlns = 'http://www.w3.org/2000/xmlns/';
   const doctype = '<?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd" [<!ENTITY nbsp "&#160;">]>';

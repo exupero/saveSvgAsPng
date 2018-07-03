@@ -6,6 +6,10 @@
 npm install save-svg-as-png
 ```
 
+## Prerequisites
+
+SaveSvgAsPng relies on JavaScript promises, so any browsers that don't natively support the standard `Promise` object will need to have a polyfill.
+
 ## Usage
 
 To save a PNG, include the script `saveSvgAsPng.js` in your page, then call the `saveSvgAsPng` function with an SVG node and a filename:

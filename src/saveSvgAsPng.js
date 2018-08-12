@@ -221,6 +221,8 @@
 
     return inlineImages(el).then(() => {
       let clone = el.cloneNode(true);
+      const {backgroundColor = 'transparent'} = options || {};
+      clone.style.backgroundColor = backgroundColor;
       const {width, height} = getDimensions(el, clone, w, h);
 
       if (el.tagName !== 'svg') {
@@ -286,7 +288,6 @@
     const {
       encoderType = 'image/png',
       encoderOptions = 0.8,
-      backgroundColor,
       canvg
     } = options || {};
 
@@ -303,12 +304,6 @@
 
       if (canvg) canvg(canvas, src);
       else context.drawImage(src, 0, 0);
-
-      if (backgroundColor) {
-        context.globalCompositeOperation = 'destination-over';
-        context.fillStyle = backgroundColor;
-        context.fillRect(0, 0, canvas.width, canvas.height);
-      }
 
       let png;
       try {

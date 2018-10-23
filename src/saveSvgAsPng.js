@@ -278,8 +278,13 @@
   out$.svgAsDataUri = (el, options, done) => {
     requireDomNode(el);
     const result = out$.prepareSvg(el, options)
-      .then(({src}) => `data:image/svg+xml;base64,${window.btoa(reEncode(doctype+src))}`);
-    if (typeof done === 'function') return result.then(done);
+      .then(({src, width, height}) => {
+          const svgXml = `data:image/svg+xml;base64,${window.btoa(reEncode(doctype+src))}`;
+          if (typeof done === 'function') {
+              done(svgXml, width, height);
+          }
+          return svgXml;
+      });
     return result;
   };
 
@@ -314,7 +319,7 @@
           return;
         } else throw e;
       }
-      if (typeof done === 'function') done(png);
+      if (typeof done === 'function') done(png, canvas.width, canvas.height);
       return Promise.resolve(png);
     }
 

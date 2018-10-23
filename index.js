@@ -1,18 +1,24 @@
 function handleFileSelect(evt) {
   const $el = $('#filereader');
   const files = evt.target.files;
-  files.forEach(file => {
+  const file = files.length > 0 ? files[0] : null;
+  if (file) {
     const reader = new FileReader();
     reader.onload = e => {
       $el.find('.load-target').html(e.target.result);
-      svgAsPngUri($el.find('.load-target svg')[0], null, uri => {
-        $el.find('input').hide()
-        $el.find('.preview').html('<img src="' + uri + '" />');
+      svgAsPngUri($el.find('.load-target svg')[0], null, (uri, width, height) => {
+        $el.find('input').hide();
+        $el.find('.preview').html(
+          '<div>' +
+            '<img src="' + uri + '" />' +
+            '<div>width=' + width + ', height=' + height + '</div>' +
+          '</div>'
+        );
       });
       $el.find('.save').click(() => saveSvgAsPng($el.find('.load-target svg')[0], 'test.png'));
     };
-    reader.readAsText(f);
-  });
+    reader.readAsText(file);
+  }
 }
 
 if (window.File && window.FileReader && window.FileList && window.Blob) {
@@ -27,8 +33,12 @@ function inlineTest(title, $el, saveOptions, testOptions) {
   row.find('.canvas').html(svg);
 
   const canvas = row.find(testOptions && testOptions.selector || 'svg')[0];
-  svgAsPngUri(canvas, saveOptions)
-    .then(uri => row.find('.preview').html('<img src="' + uri + '" />'));
+  svgAsPngUri(canvas, saveOptions, (uri, width, height) => row.find('.preview').html(
+    '<div>' +
+      '<img src="' + uri + '" />' +
+      '<div>width=' + width + ', height=' + height + '</div>' +
+    '</div>'
+  ));
 
   row.find('.save').click(() => saveSvgAsPng(canvas, 'test.png', saveOptions));
 }
@@ -79,7 +89,12 @@ $sandbox.find('.render').click(() => {
   $sandbox.find('.load-target').html($('#sandbox textarea').val());
   const canvas = $sandbox.find('.load-target svg')[0];
   try {
-    svgAsPngUri(canvas, null, uri => $sandbox.find('.preview').html('<img src="' + uri + '" />'));
+    svgAsPngUri(canvas, null, (uri, width, height) => $sandbox.find('.preview').html(
+      '<div>' +
+        '<img src="' + uri + '" />' +
+        '<div>width=' + width + ', height=' + height + '</div>' +
+      '</div>'
+    ));
     $sandbox.find('.save').unbind('click').click(() => saveSvgAsPng(canvas, 'test.png'));
   } catch(err) {
     $sandbox.find('.error').show().text(err.message);

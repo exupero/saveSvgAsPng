@@ -297,6 +297,19 @@
       </svg>
     </li>
 
+    <li id=marker-end>
+      <svg width=200 height=200>
+        <defs>
+          <marker id='head' orient="auto" markerWidth='2' markerHeight='4' refX='0.1' refY='2'>
+            <path d='M0,0 V4 L2,2 Z' fill="red"/>
+          </marker>
+        </defs>
+        <g transform="translate(50,50)">
+          <path id='arrow-line' marker-end='url(#head)' stroke-width='5' fill='none' stroke='black' d='M0,0 C45,45 45,-45 90,0' />
+        </g>
+      </svg>
+    </li>
+
     <li id=custom-font>
       <svg width=200 height=200>
         <text x=100 y=100 text-anchor=middle dy=14 style="font-family:'Stalemate';font-size:36pt;">Custom Fonts</text>

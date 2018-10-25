@@ -81,6 +81,7 @@ inlineTest('With opacity', $('#opacity'));
 inlineTest('When setting xmlns on foreign object children', $('#xmlns-override'));
 inlineTest('When using HTML entites', $('#entities'));
 inlineTest('Transformed text', $('#transformed-text'));
+inlineTest('With marker-end', $('#marker-end'));
 inlineTest('With custom fonts', $('#custom-font'));
 
 const $sandbox = $('#sandbox');

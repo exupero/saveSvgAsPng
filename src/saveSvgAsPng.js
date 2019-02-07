@@ -222,8 +222,7 @@
 
     return inlineImages(el).then(() => {
       let clone = el.cloneNode(true);
-      const {backgroundColor = 'transparent'} = options || {};
-      clone.style.backgroundColor = backgroundColor;
+      clone.style.backgroundColor = (options || {}).backgroundColor || el.style.backgroundColor;
       const {width, height} = getDimensions(el, clone, w, h);
 
       if (el.tagName !== 'svg') {

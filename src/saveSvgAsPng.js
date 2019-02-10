@@ -20,6 +20,11 @@
   const requireDomNode = el => {
     if (!isElement(el)) throw new Error(`an HTMLElement or SVGElement is required; got ${el}`);
   };
+  const requireDomNodePromise = el =>
+    new Promise((resolve, reject) => {
+      if (isElement(el)) resolve(el)
+      else reject(new Error(`an HTMLElement or SVGElement is required; got ${el}`));
+    })
   const isExternal = url => url && url.lastIndexOf('http',0) === 0 && url.lastIndexOf(window.location.host) === -1;
 
   const getFontMimeTypeFromUrl = fontUrl => {
@@ -359,20 +364,21 @@
         }
         saveLink.click();
         document.body.removeChild(saveLink);
-      }
-      else {
+      } else {
         window.open(uri, '_temp', 'menubar=no,toolbar=no,status=no');
       }
     }
   };
 
   out$.saveSvg = (el, name, options) => {
-    requireDomNode(el);
-    out$.svgAsDataUri(el, options || {}, uri => out$.download(name, uri));
+    return requireDomNodePromise(el)
+      .then(out$.svgAsDataUri(el, options || {}))
+      .then(uri => out$.download(name, uri));
   };
 
   out$.saveSvgAsPng = (el, name, options) => {
-    requireDomNode(el);
-    out$.svgAsPngUri(el, options || {}, uri => out$.download(name, uri));
+    return requireDomNodePromise(el)
+      .then(out$.svgAsPngUri(el, options || {}))
+      .then(uri => out$.download(name, uri));
   };
 })();

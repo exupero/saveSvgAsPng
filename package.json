@@ -1,6 +1,6 @@
 {
   "name": "save-svg-as-png",
-  "version": "1.4.10",
+  "version": "1.4.11",
   "description": "Convert a browser SVG to PNG or dataUri",
   "main": "lib/saveSvgAsPng.js",
   "scripts": {

@@ -315,6 +315,16 @@
       </svg>
     </li>
 
+    <li id=svg-in-svg>
+      <svg width="200" height="200">
+        <foreignObject x="50" y="50" width="50" height="100">
+          <svg width="50" height="50">
+            <image xlink:href=test.svg width=50 height=50></image>
+          </svg>
+        </foreignObject>
+      </svg>
+    </li>
+
     <li id=custom-font>
       <svg width=200 height=200>
         <text x=100 y=100 text-anchor=middle dy=14 style="font-family:'Stalemate';font-size:36pt;">Custom Fonts</text>

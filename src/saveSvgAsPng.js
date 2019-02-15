@@ -282,7 +282,7 @@
 
   out$.svgAsDataUri = (el, options, done) => {
     requireDomNode(el);
-    const result = out$.prepareSvg(el, options)
+    return out$.prepareSvg(el, options)
       .then(({src, width, height}) => {
           const svgXml = `data:image/svg+xml;base64,${window.btoa(reEncode(doctype+src))}`;
           if (typeof done === 'function') {
@@ -290,7 +290,6 @@
           }
           return svgXml;
       });
-    return result;
   };
 
   out$.svgAsPngUri = (el, options, done) => {
@@ -359,7 +358,8 @@
           saveLink.href = url;
           saveLink.onclick = () => requestAnimationFrame(() => URL.revokeObjectURL(url));
         } catch (e) {
-          console.warn('This browser does not support object URLs. Falling back to string URL.');
+          console.error(e);
+          console.warn('Error while getting object URL. Falling back to string URL.');
           saveLink.href = uri;
         }
         saveLink.click();
@@ -372,13 +372,13 @@
 
   out$.saveSvg = (el, name, options) => {
     return requireDomNodePromise(el)
-      .then(out$.svgAsDataUri(el, options || {}))
+      .then(el => out$.svgAsDataUri(el, options || {}))
       .then(uri => out$.download(name, uri));
   };
 
   out$.saveSvgAsPng = (el, name, options) => {
     return requireDomNodePromise(el)
-      .then(out$.svgAsPngUri(el, options || {}))
+      .then(el => out$.svgAsPngUri(el, options || {}))
       .then(uri => out$.download(name, uri));
   };
 })();

@@ -233,7 +233,9 @@
 
       if (el.tagName !== 'svg') {
         if (el.getBBox) {
-          clone.setAttribute('transform', clone.getAttribute('transform').replace(/translate\(.*?\)/, ''));
+          if (clone.getAttribute('transform') != null) {
+            clone.setAttribute('transform', clone.getAttribute('transform').replace(/translate\(.*?\)/, ''));
+          }
           const svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
           svg.appendChild(clone);
           clone = svg;

@@ -28,20 +28,16 @@ saveSvgAsPng(document.getElementById("diagram"), "diagram.png", {scale: 0.5});
 
 Other options are documented below.
 
-If you just want a dataURI for an SVG, you can call `svgAsDataUri` with an SVG node, options, and a callback:
+If you just want a dataURI for an SVG, you can call `svgAsDataUri`, which returns a promise:
 
 ```javascript
-svgAsDataUri(document.getElementById("diagram"), {}, function(uri) {
-  ...
-});
+svgAsDataUri(document.getElementById("diagram"), options).then(uri => ...);
 ```
 
-If you want a dataURI of a PNG generated from an SVG, you can call `svgAsPngUri` with an SVG node, options, and a callback:
+If you want a dataURI of a PNG generated from an SVG, you can call `svgAsPngUri`, which also returns a promise:
 
 ```javascript
-svgAsPngUri(document.getElementById("diagram"), {}, function(uri) {
-  ...
-});
+svgAsPngUri(document.getElementById("diagram"), options).then(uri => ...);
 ```
 
 Compatible with [browserify](http://browserify.org/) and [requirejs](http://requirejs.org).
@@ -75,4 +71,4 @@ npm test
 
 [Chrome limits data URIs to 2MB](http://stackoverflow.com/questions/695151/data-protocol-url-size-limitations/41755526#41755526), so you may have trouble generating PNGs beyod a certain size.
 
-Internet Explorer will only work if [canvg](https://github.com/canvg/canvg) is passed in, otherwise it will throw a `SecurityError` when calling `toDataURL` on a canvas that's been written to. [canvg](https://github.com/canvg/canvg) may have it's own issues with SVG support, so ensure you test the output after switching.
+Internet Explorer will only work if [canvg](https://github.com/canvg/canvg) is passed in, otherwise it will throw a `SecurityError` when calling `toDataURL` on a canvas that's been written to. [canvg](https://github.com/canvg/canvg) may have it's own issues with SVG support, so make sure to test the output.

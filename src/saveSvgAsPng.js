@@ -3,7 +3,8 @@
   if (typeof define !== 'undefined') define('save-svg-as-png', [], () => out$);
   out$.default = out$;
 
-  const xhtmlNs = 'http://www.w3.org/2000/xmlns/';
+  const xmlNs = 'http://www.w3.org/2000/xmlns/';
+  const xhtmlNs = 'http://www.w3.org/1999/xhtml';
   const svgNs = 'http://www.w3.org/2000/svg';
   const doctype = '<?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd" [<!ENTITY nbsp "&#160;">]>';
   const urlRegex = /url\(["']?(.+?)["']?\)/;
@@ -247,8 +248,8 @@
 
       clone.setAttribute('version', '1.1');
       clone.setAttribute('viewBox', [left, top, width, height].join(' '));
-      if (!clone.getAttribute('xmlns')) clone.setAttributeNS(xhtmlNs, 'xmlns', svgNs);
-      if (!clone.getAttribute('xmlns:xlink')) clone.setAttributeNS(xhtmlNs, 'xmlns:xlink', 'http://www.w3.org/1999/xlink');
+      if (!clone.getAttribute('xmlns')) clone.setAttributeNS(xmlNs, 'xmlns', svgNs);
+      if (!clone.getAttribute('xmlns:xlink')) clone.setAttributeNS(xmlNs, 'xmlns:xlink', 'http://www.w3.org/1999/xlink');
 
       if (responsive) {
         clone.removeAttribute('width');
@@ -260,10 +261,7 @@
       }
 
       Array.from(clone.querySelectorAll('foreignObject > *')).forEach(foreignObject => {
-        if (foreignObject.tagName === 'svg')
-          foreignObject.setAttributeNS(xhtmlNs, 'xmlns', svgNs);
-        else if (!foreignObject.getAttribute('xmlns'))
-          foreignObject.setAttributeNS(xhtmlNs, 'xmlns', xhtmlNs);
+        foreignObject.setAttributeNS(xmlNs, 'xmlns', foreignObject.tagName === 'svg' ? svgNs : xhtmlNs);
       });
 
       return inlineCss(el, options).then(css => {

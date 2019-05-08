@@ -368,7 +368,9 @@
         saveLink.click();
         document.body.removeChild(saveLink);
       } else {
-        window.open(uri, '_temp', 'menubar=no,toolbar=no,status=no');
+        const popup = window.open();
+        popup.document.title = name;
+        popup.location.replace(uri);
       }
     }
   };

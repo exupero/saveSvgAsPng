@@ -216,6 +216,12 @@
     return inlineFonts(fontList).then(fontCss => css.join('\n') + fontCss);
   };
 
+  const downloadOptions = () => {
+    if (!navigator.msSaveOrOpenBlob && !('download' in document.createElement('a'))) {
+      return {popup: window.open()};
+    }
+  };
+
   out$.prepareSvg = (el, options, done) => {
     requireDomNode(el);
     const {
@@ -347,7 +353,7 @@
     });
   };
 
-  out$.download = (name, uri) => {
+  out$.download = (name, uri, options) => {
     if (navigator.msSaveOrOpenBlob) navigator.msSaveOrOpenBlob(uriToBlob(uri), name);
     else {
       const saveLink = document.createElement('a');
@@ -367,23 +373,24 @@
         }
         saveLink.click();
         document.body.removeChild(saveLink);
-      } else {
-        const popup = window.open();
-        popup.document.title = name;
-        popup.location.replace(uri);
+      } else if (options && options.popup) {
+        options.popup.document.title = name;
+        options.popup.location.replace(uri);
       }
     }
   };
 
   out$.saveSvg = (el, name, options) => {
+    const downloadOpts = downloadOptions(); // don't inline, can't be async
     return requireDomNodePromise(el)
       .then(el => out$.svgAsDataUri(el, options || {}))
-      .then(uri => out$.download(name, uri));
+      .then(uri => out$.download(name, uri, downloadOpts));
   };
 
   out$.saveSvgAsPng = (el, name, options) => {
+    const downloadOpts = downloadOptions(); // don't inline, can't be async
     return requireDomNodePromise(el)
       .then(el => out$.svgAsPngUri(el, options || {}))
-      .then(uri => out$.download(name, uri));
+      .then(uri => out$.download(name, uri, downloadOpts));
   };
 })();

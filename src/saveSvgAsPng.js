@@ -208,7 +208,9 @@
           else if (detectFonts && rule.cssText.match(/^@font-face/)) {
             const font = detectCssFont(rule, href);
             if (font) fontList.push(font);
-          } else css.push(rule.cssText);
+          } else if (!excludeUnusedCss) {
+            css.push(rule.cssText);
+          }
         }
       });
     });

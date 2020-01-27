@@ -84,6 +84,7 @@ inlineTest('Transformed text', $('#transformed-text'));
 inlineTest('With marker-end', $('#marker-end'));
 inlineTest('SVG style attribute', $('#style-background'));
 inlineTest('SVG within SVG', $('#svg-in-svg'));
+inlineTest('excluding unused CSS', $('#exclude-unused-css'), {excludeUnusedCss: true});
 inlineTest('With custom fonts', $('#custom-font'));
 
 const $sandbox = $('#sandbox');

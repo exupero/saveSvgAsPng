@@ -190,7 +190,8 @@
       selectorRemap,
       modifyStyle,
       modifyCss,
-      fonts
+      fonts,
+      excludeUnusedCss
     } = options || {};
     const generateCss = modifyCss || ((selector, properties) => {
       const sel = selectorRemap ? selectorRemap(selector) : selector;
